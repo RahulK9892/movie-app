@@ -2,8 +2,9 @@ import streamlit as st
 import requests
 
 # ================= CONFIG =================
-API_KEY = "f04c0df7"
-BASE_URL = "http://www.omdbapi.com/"
+TMDB_API_KEY = "56bb6403529bf7858db4fb63d2d8ca55"
+BASE_URL = "https://api.themoviedb.org/3"
+IMG_URL = "https://image.tmdb.org/t/p/w500"
 
 st.set_page_config(page_title="CineScope", layout="wide")
 
@@ -32,24 +33,25 @@ body {background-color:#0b0f19;}
 st.markdown('<div class="title">🎬 CineScope</div>', unsafe_allow_html=True)
 st.write("Discover movies with style ✨")
 
-# ================= SAFE API =================
-def safe_api(params):
+# ================= API FUNCTIONS =================
+def fetch_data(url):
     try:
-        params["apikey"] = API_KEY
-        res = requests.get(BASE_URL, params=params, timeout=5)
-        data = res.json()
-
-        if data.get("Response") == "True":
-            return data
-        return None
+        res = requests.get(url, timeout=5)
+        return res.json()
     except:
         return None
 
-def get_movie(name):
-    return safe_api({"t": name})
+def search_movie(query):
+    url = f"{BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={query}"
+    return fetch_data(url)
 
-def search_movie(name):
-    return safe_api({"s": name})
+def trending_movies():
+    url = f"{BASE_URL}/trending/movie/week?api_key={TMDB_API_KEY}"
+    return fetch_data(url)
+
+def movie_details(movie_id):
+    url = f"{BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}"
+    return fetch_data(url)
 
 # ================= SEARCH =================
 movie_name = st.text_input("🔍 Search any movie")
@@ -58,45 +60,44 @@ if st.button("Search"):
     if movie_name.strip() == "":
         st.warning("Enter a movie name")
     else:
-        with st.spinner("Fetching movie..."):
-            data = get_movie(movie_name.strip())
+        with st.spinner("Searching..."):
+            data = search_movie(movie_name)
 
-        if data:
+        if data and data.get("results"):
+            movie = data["results"][0]
+
             st.markdown("---")
             col1, col2 = st.columns([1,2])
 
             with col1:
-                if data.get("Poster") and data["Poster"] != "N/A":
-                    st.image(data["Poster"])
+                if movie.get("poster_path"):
+                    st.image(IMG_URL + movie["poster_path"])
 
             with col2:
-                st.markdown(f"## {data.get('Title')} ({data.get('Year')})")
-                st.write(f"⭐ IMDB: {data.get('imdbRating')}")
-                st.write(f"🎭 Genre: {data.get('Genre')}")
-                st.write(f"🎬 Director: {data.get('Director')}")
-                st.write(f"👨‍🎤 Actors: {data.get('Actors')}")
-                st.write(f"📝 {data.get('Plot')}")
+                st.markdown(f"## {movie.get('title')}")
+                st.write(f"⭐ Rating: {movie.get('vote_average')}")
+                st.write(f"📅 Release: {movie.get('release_date')}")
+                st.write(f"📝 {movie.get('overview')}")
         else:
-            st.warning("⚠️ Couldn't fetch movie. Try again.")
+            st.warning("No results found")
 
-# ================= TRENDING (100% SAFE) =================
+# ================= TRENDING =================
 st.markdown('<div class="section">🔥 Trending</div>', unsafe_allow_html=True)
 
-trending = ["Avengers", "Batman", "Avatar", "Titanic", "Inception"]
-cols = st.columns(5)
+trend = trending_movies()
 
-for i, m in enumerate(trending):
-    data = get_movie(m)
+if trend and trend.get("results"):
+    cols = st.columns(5)
 
-    with cols[i]:
-        if data:  # ONLY SHOW VALID
+    for i, movie in enumerate(trend["results"][:10]):
+        with cols[i % 5]:
             st.markdown('<div class="card">', unsafe_allow_html=True)
 
-            if data.get("Poster") != "N/A":
-                st.image(data["Poster"])
+            if movie.get("poster_path"):
+                st.image(IMG_URL + movie["poster_path"])
 
-            st.write(data.get("Title"))
-            st.caption(data.get("Year"))
+            st.write(movie.get("title"))
+            st.caption(movie.get("release_date"))
 
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -104,19 +105,19 @@ for i, m in enumerate(trending):
 if movie_name:
     st.markdown('<div class="section">🎯 Discover Similar</div>', unsafe_allow_html=True)
 
-    results = search_movie(movie_name)
+    data = search_movie(movie_name)
 
-    if results:
+    if data and data.get("results"):
         cols = st.columns(5)
 
-        for i, m in enumerate(results["Search"][:10]):
+        for i, movie in enumerate(data["results"][:10]):
             with cols[i % 5]:
                 st.markdown('<div class="card">', unsafe_allow_html=True)
 
-                if m.get("Poster") != "N/A":
-                    st.image(m["Poster"])
+                if movie.get("poster_path"):
+                    st.image(IMG_URL + movie["poster_path"])
 
-                st.write(m.get("Title"))
-                st.caption(m.get("Year"))
+                st.write(movie.get("title"))
+                st.caption(movie.get("release_date"))
 
                 st.markdown('</div>', unsafe_allow_html=True)

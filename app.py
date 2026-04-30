@@ -2,8 +2,7 @@ import streamlit as st
 import requests
 
 # ================= CONFIG =================
-API_KEY = "YOUR_API_KEY_HERE"  # replace this
-
+API_KEY = "f04c0df7"
 st.set_page_config(page_title="CineScope", layout="wide")
 
 # ================= CUSTOM UI =================

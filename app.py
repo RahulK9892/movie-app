@@ -5,24 +5,28 @@ import requests
 API_KEY = "f04c0df7"
 st.set_page_config(page_title="CineScope", layout="wide")
 
-# ================= CUSTOM UI =================
+# ================= STYLE =================
 st.markdown("""
 <style>
 body {
     background-color: #0b0f19;
 }
 
-/* Title */
 .title {
-    font-size: 40px;
+    font-size: 42px;
     font-weight: bold;
     color: #00f5ff;
 }
 
-/* Glass card */
+.section {
+    font-size: 24px;
+    margin-top: 30px;
+    color: #ffffff;
+}
+
 .card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
     border-radius: 15px;
     backdrop-filter: blur(10px);
     text-align: center;
@@ -33,13 +37,6 @@ body {
     transform: translateY(-5px) scale(1.03);
     box-shadow: 0 0 15px #00f5ff;
 }
-
-/* Section title */
-.section {
-    font-size: 24px;
-    margin-top: 30px;
-    color: #ffffff;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -47,40 +44,51 @@ body {
 st.markdown('<div class="title">🎬 CineScope</div>', unsafe_allow_html=True)
 st.write("Discover movies with style ✨")
 
+# ================= FUNCTIONS =================
+@st.cache_data
+def get_movie(movie):
+    try:
+        url = f"http://www.omdbapi.com/?t={movie}&apikey={API_KEY}"
+        return requests.get(url, timeout=5).json()
+    except:
+        return {}
+
+@st.cache_data
+def search_movies(movie):
+    try:
+        url = f"http://www.omdbapi.com/?s={movie}&apikey={API_KEY}"
+        return requests.get(url, timeout=5).json()
+    except:
+        return {}
+
 # ================= SEARCH =================
 movie_name = st.text_input("🔍 Search any movie")
 
-# ================= FUNCTIONS =================
-def get_movie(movie):
-    url = f"http://www.omdbapi.com/?t={movie}&apikey={API_KEY}"
-    return requests.get(url).json()
-
-def search_movies(movie):
-    url = f"http://www.omdbapi.com/?s={movie}&apikey={API_KEY}"
-    return requests.get(url).json()
-
-# ================= MAIN SEARCH =================
 if st.button("Search"):
-    if movie_name:
-        data = get_movie(movie_name)
+    if not movie_name:
+        st.warning("Please enter a movie name")
+    else:
+        with st.spinner("Fetching movie..."):
+            data = get_movie(movie_name)
 
-        if data["Response"] == "True":
+        if data.get("Response") == "True":
             st.markdown("---")
 
             col1, col2 = st.columns([1,2])
 
             with col1:
-                if data["Poster"] != "N/A":
+                if data.get("Poster") and data["Poster"] != "N/A":
                     st.image(data["Poster"])
+                else:
+                    st.write("No poster available")
 
             with col2:
-                st.markdown(f"## {data['Title']} ({data['Year']})")
-                st.write(f"⭐ IMDB: {data['imdbRating']}")
-                st.write(f"🎭 Genre: {data['Genre']}")
-                st.write(f"🎬 Director: {data['Director']}")
-                st.write(f"👨‍🎤 Actors: {data['Actors']}")
-                st.write(f"📝 Plot: {data['Plot']}")
-
+                st.markdown(f"## {data.get('Title','N/A')} ({data.get('Year','N/A')})")
+                st.write(f"⭐ IMDB: {data.get('imdbRating','N/A')}")
+                st.write(f"🎭 Genre: {data.get('Genre','N/A')}")
+                st.write(f"🎬 Director: {data.get('Director','N/A')}")
+                st.write(f"👨‍🎤 Actors: {data.get('Actors','N/A')}")
+                st.write(f"📝 Plot: {data.get('Plot','N/A')}")
         else:
             st.error("Movie not found ❌")
 
@@ -88,7 +96,6 @@ if st.button("Search"):
 st.markdown('<div class="section">🔥 Trending</div>', unsafe_allow_html=True)
 
 trending = ["Avengers", "Joker", "Interstellar", "Inception", "Titanic"]
-
 cols = st.columns(5)
 
 for i, movie in enumerate(trending):
@@ -97,11 +104,16 @@ for i, movie in enumerate(trending):
     with cols[i]:
         st.markdown('<div class="card">', unsafe_allow_html=True)
 
-        if data["Poster"] != "N/A":
-            st.image(data["Poster"])
+        if data.get("Response") == "True":
+            if data.get("Poster") and data["Poster"] != "N/A":
+                st.image(data["Poster"])
+            else:
+                st.write("No Image")
 
-        st.write(data["Title"])
-        st.caption(data["Year"])
+            st.write(data.get("Title", "N/A"))
+            st.caption(data.get("Year", "N/A"))
+        else:
+            st.write("Not found")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -111,17 +123,23 @@ if movie_name:
 
     results = search_movies(movie_name)
 
-    if results["Response"] == "True":
+    if results.get("Response") == "True":
+        movies = results.get("Search", [])
+
         cols = st.columns(5)
 
-        for i, movie in enumerate(results["Search"][:10]):
+        for i, movie in enumerate(movies[:10]):
             with cols[i % 5]:
                 st.markdown('<div class="card">', unsafe_allow_html=True)
 
-                if movie["Poster"] != "N/A":
+                if movie.get("Poster") and movie["Poster"] != "N/A":
                     st.image(movie["Poster"])
+                else:
+                    st.write("No Image")
 
-                st.write(movie["Title"])
-                st.caption(movie["Year"])
+                st.write(movie.get("Title", "N/A"))
+                st.caption(movie.get("Year", "N/A"))
 
                 st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.write("No similar movies found")

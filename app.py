@@ -44,6 +44,15 @@ def get_person_movies(person_id):
     url = f"https://api.themoviedb.org/3/person/{person_id}/movie_credits?api_key={TMDB_API_KEY}"
     return requests.get(url).json()
 
+# ===== NEW (STEP 1) =====
+def get_trending():
+    url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
+    return requests.get(url).json()
+
+def get_top_rated():
+    url = f"https://api.themoviedb.org/3/movie/top_rated?api_key={TMDB_API_KEY}"
+    return requests.get(url).json()
+
 # ================= SIDEBAR =================
 menu = st.sidebar.radio("Menu", ["Home", "Watchlist"])
 
@@ -63,29 +72,68 @@ if menu == "Watchlist":
                 st.session_state.page = "movie"
                 st.rerun()
 
-# ================= HOME =================
+# ================= HOME (STEP 2) =================
 if st.session_state.page == "home":
+
     st.title("🎬 LUMORA")
+    st.write("Discover movies like a real OTT platform ✨")
 
     query = st.text_input("🔍 Search movie")
 
+    # ===== SEARCH =====
     if query:
         results = search_movie(query)
 
         if results.get("results"):
-            cols = st.columns(5)
+            st.markdown("## 🔍 Results")
 
+            cols = st.columns(5)
             for i, movie in enumerate(results["results"][:10]):
                 with cols[i % 5]:
                     if movie.get("poster_path"):
                         st.image(BASE_IMG + movie["poster_path"])
-
                     st.write(movie["title"])
 
                     if st.button("View", key=f"search_{movie['id']}"):
                         st.session_state.movie_id = movie["id"]
                         st.session_state.page = "movie"
                         st.rerun()
+
+    # ===== TRENDING =====
+    st.markdown("## 🔥 Trending Now")
+    trending = get_trending()
+
+    if trending.get("results"):
+        cols = st.columns(5)
+
+        for i, movie in enumerate(trending["results"][:10]):
+            with cols[i % 5]:
+                if movie.get("poster_path"):
+                    st.image(BASE_IMG + movie["poster_path"])
+                st.write(movie["title"])
+
+                if st.button("View", key=f"trend_{movie['id']}"):
+                    st.session_state.movie_id = movie["id"]
+                    st.session_state.page = "movie"
+                    st.rerun()
+
+    # ===== TOP RATED =====
+    st.markdown("## ⭐ Top Rated")
+    top = get_top_rated()
+
+    if top.get("results"):
+        cols = st.columns(5)
+
+        for i, movie in enumerate(top["results"][:10]):
+            with cols[i % 5]:
+                if movie.get("poster_path"):
+                    st.image(BASE_IMG + movie["poster_path"])
+                st.write(movie["title"])
+
+                if st.button("View", key=f"top_{movie['id']}"):
+                    st.session_state.movie_id = movie["id"]
+                    st.session_state.page = "movie"
+                    st.rerun()
 
 # ================= MOVIE PAGE =================
 if st.session_state.page == "movie":
@@ -113,7 +161,7 @@ if st.session_state.page == "movie":
             if movie_id not in st.session_state.watchlist:
                 st.session_state.watchlist.append(movie_id)
 
-    # ===== BOX OFFICE SECTION =====
+    # ===== BOX OFFICE =====
     st.markdown("## 💰 Box Office & Budget")
 
     revenue = data.get("revenue", 0)
@@ -191,7 +239,6 @@ if st.session_state.page == "movie":
             with cols[i % 5]:
                 if m.get("poster_path"):
                     st.image(BASE_IMG + m["poster_path"])
-
                 st.write(m["title"])
 
                 if st.button("View", key=f"rec_{m['id']}"):

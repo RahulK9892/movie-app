@@ -8,8 +8,6 @@ BASE_IMG = "https://image.tmdb.org/t/p/w500"
 st.set_page_config(page_title="LUMORA", layout="wide")
 
 # ================= SESSION =================
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = True   # keep auto login for now
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
 if "page" not in st.session_state:
@@ -110,11 +108,41 @@ if st.session_state.page == "movie":
         st.subheader(data.get("title"))
         st.write(f"⭐ {data.get('vote_average')}")
         st.write(data.get("overview"))
-        st.write(f"💰 ${data.get('revenue', 0):,}")
 
         if st.button("❤️ Add to Watchlist"):
             if movie_id not in st.session_state.watchlist:
                 st.session_state.watchlist.append(movie_id)
+
+    # ===== BOX OFFICE SECTION =====
+    st.markdown("## 💰 Box Office & Budget")
+
+    revenue = data.get("revenue", 0)
+    budget = data.get("budget", 0)
+
+    def format_money(amount):
+        if amount >= 1_000_000_000:
+            return f"${amount/1_000_000_000:.2f} Billion"
+        elif amount >= 1_000_000:
+            return f"${amount/1_000_000:.2f} Million"
+        elif amount > 0:
+            return f"${amount:,}"
+        else:
+            return "Not Available"
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("🌍 Worldwide Box Office", format_money(revenue))
+
+    with col2:
+        st.metric("🎬 Production Budget", format_money(budget))
+
+    with col3:
+        if revenue and budget:
+            profit = revenue - budget
+            st.metric("📈 Estimated Profit", format_money(profit))
+        else:
+            st.metric("📈 Estimated Profit", "Not Available")
 
     # ===== TRAILER =====
     trailer = get_trailer(movie_id)

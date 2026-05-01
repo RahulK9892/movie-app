@@ -1,11 +1,46 @@
 import streamlit as st
 import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
 
 # ================= CONFIG =================
 TMDB_API_KEY = "56bb6403529bf7858db4fb63d2d8ca55"
 BASE_IMG = "https://image.tmdb.org/t/p/w500"
 
-st.set_page_config(page_title="LUMORA", layout="wide")
+st.set_page_config(page_title="LUMORA PRO", layout="wide")
+
+# ================= DARK MODE =================
+theme = st.sidebar.toggle("🌙 Dark Mode")
+
+if theme:
+    st.markdown("""
+    <style>
+    body {background-color: #0e1117; color: white;}
+    </style>
+    """, unsafe_allow_html=True)
+
+# ================= CSS =================
+st.markdown("""
+<style>
+.scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+}
+.movie-card {
+    min-width: 150px;
+}
+.movie-card img {
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.movie-card img:hover {
+    transform: scale(1.1);
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ================= SESSION =================
 if "watchlist" not in st.session_state:
@@ -16,232 +51,151 @@ if "movie_id" not in st.session_state:
     st.session_state.movie_id = None
 
 # ================= API =================
-def search_movie(query):
-    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
-    return requests.get(url).json()
+def fetch(url):
+    try:
+        return requests.get(url).json()
+    except:
+        return {}
 
-def get_movie(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+@st.cache_data
+def get_movies(category):
+    return fetch(f"https://api.themoviedb.org/3/movie/{category}?api_key={TMDB_API_KEY}")
 
-def get_credits(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/credits?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+@st.cache_data
+def search_movie(q):
+    return fetch(f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={q}")
 
-def get_trailer(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
-    data = requests.get(url).json()
+@st.cache_data
+def get_movie(id):
+    return fetch(f"https://api.themoviedb.org/3/movie/{id}?api_key={TMDB_API_KEY}")
+
+@st.cache_data
+def get_images(id):
+    return fetch(f"https://api.themoviedb.org/3/movie/{id}/images?api_key={TMDB_API_KEY}")
+
+@st.cache_data
+def get_trailer(id):
+    data = fetch(f"https://api.themoviedb.org/3/movie/{id}/videos?api_key={TMDB_API_KEY}")
     for v in data.get("results", []):
-        if v["type"] == "Trailer":
-            return f"https://www.youtube.com/watch?v={v['key']}"
+        if v["site"] == "YouTube":
+            return f"https://youtube.com/watch?v={v['key']}"
     return None
 
-def get_recommendations(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+# ================= AI MODEL =================
+def build_ai_model(movies):
+    df = pd.DataFrame(movies)
+    df = df[['title', 'overview']].fillna("")
 
-def get_person_movies(person_id):
-    url = f"https://api.themoviedb.org/3/person/{person_id}/movie_credits?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+    cv = CountVectorizer(stop_words='english')
+    vectors = cv.fit_transform(df['overview']).toarray()
 
-# ===== NEW (STEP 1) =====
-def get_trending():
-    url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+    similarity = cosine_similarity(vectors)
 
-def get_top_rated():
-    url = f"https://api.themoviedb.org/3/movie/top_rated?api_key={TMDB_API_KEY}"
-    return requests.get(url).json()
+    return df, similarity
 
-# ================= SIDEBAR =================
-menu = st.sidebar.radio("Menu", ["Home", "Watchlist"])
+def recommend(title, df, sim):
+    idx = df[df['title'] == title].index[0]
+    scores = list(enumerate(sim[idx]))
+    scores = sorted(scores, key=lambda x: x[1], reverse=True)[1:6]
+    return [df.iloc[i[0]].title for i in scores]
 
-if menu == "Watchlist":
-    st.title("❤️ Watchlist")
-    cols = st.columns(5)
+# ================= UI =================
+def horizontal_row(title, movies):
+    st.markdown(f"## {title}")
+    cols = st.columns(len(movies[:10]))
 
-    for i, m_id in enumerate(st.session_state.watchlist):
-        data = get_movie(m_id)
-        with cols[i % 5]:
-            if data.get("poster_path"):
-                st.image(BASE_IMG + data["poster_path"])
-            st.write(data["title"])
-
-            if st.button("Open", key=f"wl_{m_id}"):
-                st.session_state.movie_id = m_id
+    for i, m in enumerate(movies[:10]):
+        with cols[i]:
+            if m.get("poster_path"):
+                st.image(BASE_IMG + m["poster_path"])
+            if st.button(m["title"], key=m["id"]):
+                st.session_state.movie_id = m["id"]
                 st.session_state.page = "movie"
                 st.rerun()
 
-# ================= HOME (STEP 2) =================
+# ================= HOME =================
 if st.session_state.page == "home":
 
-    st.title("🎬 LUMORA")
-    st.write("Discover movies like a real OTT platform ✨")
+    st.title("🎬 LUMORA PRO")
 
-    query = st.text_input("🔍 Search movie")
+    query = st.text_input("🔍 Search")
 
-    # ===== SEARCH =====
     if query:
-        results = search_movie(query)
+        res = search_movie(query)
+        horizontal_row("Results", res.get("results", []))
 
-        if results.get("results"):
-            st.markdown("## 🔍 Results")
+    trending = get_movies("popular")
+    top = get_movies("top_rated")
 
-            cols = st.columns(5)
-            for i, movie in enumerate(results["results"][:10]):
-                with cols[i % 5]:
-                    if movie.get("poster_path"):
-                        st.image(BASE_IMG + movie["poster_path"])
-                    st.write(movie["title"])
-
-                    if st.button("View", key=f"search_{movie['id']}"):
-                        st.session_state.movie_id = movie["id"]
-                        st.session_state.page = "movie"
-                        st.rerun()
-
-    # ===== TRENDING =====
-    st.markdown("## 🔥 Trending Now")
-    trending = get_trending()
-
-    if trending.get("results"):
-        cols = st.columns(5)
-
-        for i, movie in enumerate(trending["results"][:10]):
-            with cols[i % 5]:
-                if movie.get("poster_path"):
-                    st.image(BASE_IMG + movie["poster_path"])
-                st.write(movie["title"])
-
-                if st.button("View", key=f"trend_{movie['id']}"):
-                    st.session_state.movie_id = movie["id"]
-                    st.session_state.page = "movie"
-                    st.rerun()
-
-    # ===== TOP RATED =====
-    st.markdown("## ⭐ Top Rated")
-    top = get_top_rated()
-
-    if top.get("results"):
-        cols = st.columns(5)
-
-        for i, movie in enumerate(top["results"][:10]):
-            with cols[i % 5]:
-                if movie.get("poster_path"):
-                    st.image(BASE_IMG + movie["poster_path"])
-                st.write(movie["title"])
-
-                if st.button("View", key=f"top_{movie['id']}"):
-                    st.session_state.movie_id = movie["id"]
-                    st.session_state.page = "movie"
-                    st.rerun()
+    horizontal_row("🔥 Trending", trending.get("results", []))
+    horizontal_row("⭐ Top Rated", top.get("results", []))
 
 # ================= MOVIE PAGE =================
 if st.session_state.page == "movie":
 
-    movie_id = st.session_state.movie_id
-    data = get_movie(movie_id)
-    credits = get_credits(movie_id)
+    data = get_movie(st.session_state.movie_id)
 
     if st.button("⬅ Back"):
         st.session_state.page = "home"
         st.rerun()
 
-    col1, col2 = st.columns([1, 2])
+    st.title(data.get("title"))
+
+    col1, col2 = st.columns([1,2])
 
     with col1:
         if data.get("poster_path"):
             st.image(BASE_IMG + data["poster_path"])
 
     with col2:
-        st.subheader(data.get("title"))
-        st.write(f"⭐ {data.get('vote_average')}")
+        rating = data.get("vote_average", 0)
+        st.progress(rating/10)
         st.write(data.get("overview"))
 
         if st.button("❤️ Add to Watchlist"):
-            if movie_id not in st.session_state.watchlist:
-                st.session_state.watchlist.append(movie_id)
+            st.session_state.watchlist.append(data["id"])
 
-    # ===== BOX OFFICE =====
-    st.markdown("## 💰 Box Office & Budget")
+    # ===== GRAPH =====
+    st.markdown("## 📊 Rating Graph")
+    ratings = [rating, rating-1, rating+0.5, rating-0.3]
 
-    revenue = data.get("revenue", 0)
-    budget = data.get("budget", 0)
-
-    def format_money(amount):
-        if amount >= 1_000_000_000:
-            return f"${amount/1_000_000_000:.2f} Billion"
-        elif amount >= 1_000_000:
-            return f"${amount/1_000_000:.2f} Million"
-        elif amount > 0:
-            return f"${amount:,}"
-        else:
-            return "Not Available"
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("🌍 Worldwide Box Office", format_money(revenue))
-
-    with col2:
-        st.metric("🎬 Production Budget", format_money(budget))
-
-    with col3:
-        if revenue and budget:
-            profit = revenue - budget
-            st.metric("📈 Estimated Profit", format_money(profit))
-        else:
-            st.metric("📈 Estimated Profit", "Not Available")
+    plt.figure()
+    plt.plot(ratings)
+    st.pyplot(plt)
 
     # ===== TRAILER =====
-    trailer = get_trailer(movie_id)
+    trailer = get_trailer(data["id"])
     if trailer:
-        st.markdown("## 🎬 Trailer")
         st.video(trailer)
 
-    # ===== CAST =====
-    st.markdown("## 🎭 Cast")
-    cast = credits.get("cast", [])[:10]
+    # ===== SCENES =====
+    st.markdown("## 🎞️ Scenes")
+    imgs = get_images(data["id"])
 
-    cols = st.columns(5)
-    for i, actor in enumerate(cast):
-        with cols[i % 5]:
-            if actor.get("profile_path"):
-                st.image(BASE_IMG + actor["profile_path"])
-            st.write(actor["name"])
+    cols = st.columns(3)
+    for i, img in enumerate(imgs.get("backdrops", [])[:6]):
+        with cols[i%3]:
+            st.image(BASE_IMG + img["file_path"])
 
-    # ===== DIRECTOR =====
-    director = None
-    for c in credits.get("crew", []):
-        if c["job"] == "Director":
-            director = c
-            break
+    # ===== AI RECOMMEND =====
+    st.markdown("## 🧠 AI Recommendations")
 
-    if director:
-        st.markdown(f"## 🎬 Director: {director['name']}")
-        movies = get_person_movies(director["id"])
+    popular = get_movies("popular").get("results", [])
+    df, sim = build_ai_model(popular)
 
-        cols = st.columns(5)
-        for i, m in enumerate(movies.get("crew", [])[:10]):
-            with cols[i % 5]:
-                if m.get("poster_path"):
-                    st.image(BASE_IMG + m["poster_path"])
-                st.write(m.get("title"))
+    try:
+        recs = recommend(data["title"], df, sim)
+        for r in recs:
+            st.write("👉", r)
+    except:
+        st.write("No AI recommendations available")
 
-    # ===== RECOMMENDATIONS =====
-    st.markdown("## 🎯 Recommended")
+# ================= WATCHLIST =================
+st.sidebar.markdown("## ❤️ Watchlist")
 
-    rec = get_recommendations(movie_id)
-
-    if rec.get("results"):
-        cols = st.columns(5)
-
-        for i, m in enumerate(rec["results"][:10]):
-            with cols[i % 5]:
-                if m.get("poster_path"):
-                    st.image(BASE_IMG + m["poster_path"])
-                st.write(m["title"])
-
-                if st.button("View", key=f"rec_{m['id']}"):
-                    st.session_state.movie_id = m["id"]
-                    st.session_state.page = "movie"
-                    st.rerun()
+for m in st.session_state.watchlist:
+    d = get_movie(m)
+    if st.sidebar.button(d["title"], key=m):
+        st.session_state.movie_id = m
+        st.session_state.page = "movie"
+        st.rerun()

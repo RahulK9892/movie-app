@@ -4,97 +4,48 @@ import requests
 # ================= CONFIG =================
 st.set_page_config(page_title="LUMORA", layout="wide")
 
-# 🔐 Use Streamlit Secrets (see instructions below)
 TMDB_API_KEY = st.secrets["TMDB_API_KEY"]
-
 BASE_URL = "https://api.themoviedb.org/3"
-IMG_URL = "https://image.tmdb.org/t/p/w500"
+IMG = "https://image.tmdb.org/t/p/w500"
 
-# ================= SESSION =================
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "watchlist" not in st.session_state:
-    st.session_state.watchlist = []
-if "selected_movie" not in st.session_state:
-    st.session_state.selected_movie = None
-
-# ================= STYLE =================
+# ================= CSS (NETFLIX STYLE) =================
 st.markdown("""
 <style>
-body {background-color:#0b0f19;}
-
-.title {
-    font-size:42px;
-    font-weight:bold;
-    color:#00f5ff;
-}
+body {background-color:#0b0f1a; color:white;}
 
 .movie-card {
-    transition: 0.3s;
-    border-radius: 12px;
+    transition: transform 0.3s ease;
 }
 .movie-card:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 20px #00f5ff;
 }
 
-.sidebar-card {
-    background: rgba(255,255,255,0.05);
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:10px;
+.section-title {
+    font-size:26px;
+    font-weight:bold;
+    margin-top:20px;
+}
+
+.stButton>button {
+    border-radius:8px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ================= LOGIN =================
-if not st.session_state.logged_in:
-    st.markdown('<div class="title">🎬 LUMORA Login</div>', unsafe_allow_html=True)
-
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-
-    if st.button("Login"):
-        if username == "admin" and password == "123":
-            st.session_state.logged_in = True
-            st.rerun()
-        else:
-            st.error("Invalid login")
-
-    st.stop()
-
-# ================= SIDEBAR =================
-st.sidebar.title("🎛 Menu")
-menu = st.sidebar.radio("", ["Home", "Watchlist", "Logout"])
-
-# Watchlist UI (improved)
-st.sidebar.markdown("## ❤️ Watchlist")
-if st.session_state.watchlist:
-    for movie in st.session_state.watchlist:
-        st.sidebar.markdown(f'<div class="sidebar-card">{movie}</div>', unsafe_allow_html=True)
-else:
-    st.sidebar.write("Empty")
-
-if menu == "Logout":
-    st.session_state.logged_in = False
-    st.session_state.watchlist = []
-    st.session_state.selected_movie = None
-    st.rerun()
-
 # ================= FUNCTIONS =================
 def fetch(url):
-    try:
-        return requests.get(url, timeout=5).json()
-    except:
-        return {}
+    return requests.get(url).json()
 
 def search_movie(query):
-    return fetch(f"{BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={query}").get("results", [])
+    return fetch(f"{BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={query}")
 
-def get_movie(movie_id):
+def get_trending():
+    return fetch(f"{BASE_URL}/trending/movie/week?api_key={TMDB_API_KEY}")
+
+def get_details(movie_id):
     return fetch(f"{BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}")
 
-def get_cast(movie_id):
+def get_credits(movie_id):
     return fetch(f"{BASE_URL}/movie/{movie_id}/credits?api_key={TMDB_API_KEY}")
 
 def get_trailer(movie_id):
@@ -105,126 +56,155 @@ def get_trailer(movie_id):
     return None
 
 def get_recommendations(movie_id):
-    return fetch(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}").get("results", [])[:10]
+    return fetch(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}")
 
-def get_trending():
-    return fetch(f"{BASE_URL}/trending/movie/week?api_key={TMDB_API_KEY}").get("results", [])[:10]
+# ================= SESSION =================
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+if "movie_id" not in st.session_state:
+    st.session_state.movie_id = None
+if "watchlist" not in st.session_state:
+    st.session_state.watchlist = []
 
-def format_money(amount):
-    if amount >= 1_000_000_000:
-        return f"${amount/1_000_000_000:.2f} Billion"
-    elif amount >= 1_000_000:
-        return f"${amount/1_000_000:.2f} Million"
-    elif amount > 0:
-        return f"${amount:,}"
-    return "Not Available"
+# ================= HEADER =================
+st.markdown("## 🎬 LUMORA")
+
+query = st.text_input("🔍 Search movie")
+
+# ================= LOADING =================
+def loading():
+    with st.spinner("Loading..."):
+        pass
 
 # ================= HOME =================
-if menu == "Home":
-    st.markdown('<div class="title">🎬 LUMORA</div>', unsafe_allow_html=True)
+if st.session_state.page == "home":
 
-    query = st.text_input("🔍 Search movie")
-
-    # ===== SEARCH =====
+    # ===== SEARCH RESULT =====
     if query:
-        with st.spinner("Searching..."):
-            results = search_movie(query)
+        loading()
+        results = search_movie(query)
 
+        st.markdown("### 🔎 Results")
         cols = st.columns(5)
-        for i, movie in enumerate(results[:10]):
+
+        for i, m in enumerate(results.get("results", [])[:10]):
             with cols[i % 5]:
-                st.markdown('<div class="movie-card">', unsafe_allow_html=True)
-                if movie.get("poster_path"):
-                    st.image(IMG_URL + movie["poster_path"])
-                st.write(movie["title"])
-                if st.button("View", key=f"s_{movie['id']}"):
-                    st.session_state.selected_movie = movie["id"]
+                if m.get("poster_path"):
+                    st.image(IMG + m["poster_path"])
+                st.write(m["title"])
+                if st.button("View", key=m["id"]):
+                    st.session_state.movie_id = m["id"]
+                    st.session_state.page = "details"
                     st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
 
-    # ===== TRENDING =====
-    st.markdown("## 🔥 Trending")
-    with st.spinner("Loading trending..."):
-        trending = get_trending()
+    # ===== TRENDING CAROUSEL =====
+    st.markdown('<div class="section-title">🔥 Trending</div>', unsafe_allow_html=True)
+    trending = get_trending()
 
-    cols = st.columns(5)
-    for i, movie in enumerate(trending):
-        with cols[i % 5]:
-            if movie.get("poster_path"):
-                st.image(IMG_URL + movie["poster_path"])
-            if st.button("Open", key=f"t_{movie['id']}"):
-                st.session_state.selected_movie = movie["id"]
+    cols = st.columns(6)
+    for i, m in enumerate(trending.get("results", [])[:12]):
+        with cols[i % 6]:
+            st.markdown('<div class="movie-card">', unsafe_allow_html=True)
+            if m.get("poster_path"):
+                st.image(IMG + m["poster_path"])
+            st.write(m["title"])
+            if st.button("View", key=f"trend{i}"):
+                st.session_state.movie_id = m["id"]
+                st.session_state.page = "details"
                 st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
 
-# ================= WATCHLIST PAGE =================
-elif menu == "Watchlist":
-    st.title("❤️ Your Watchlist")
-    if not st.session_state.watchlist:
-        st.write("No movies yet")
-    else:
-        for m in st.session_state.watchlist:
-            st.write("🎬", m)
+    # ===== WATCHLIST =====
+    if st.session_state.watchlist:
+        st.markdown('<div class="section-title">❤️ Watchlist</div>', unsafe_allow_html=True)
+        cols = st.columns(6)
+        for i, m in enumerate(st.session_state.watchlist):
+            with cols[i % 6]:
+                st.image(IMG + m["poster"])
+                st.write(m["title"])
 
-# ================= MOVIE DETAILS =================
-if st.session_state.selected_movie:
-    movie_id = st.session_state.selected_movie
+# ================= DETAILS =================
+elif st.session_state.page == "details":
 
-    with st.spinner("Loading movie details..."):
-        data = get_movie(movie_id)
-        cast_data = get_cast(movie_id)
+    loading()
+    movie_id = st.session_state.movie_id
 
-    st.button("⬅ Back", on_click=lambda: st.session_state.update(selected_movie=None))
+    data = get_details(movie_id)
+    credits = get_credits(movie_id)
+    trailer = get_trailer(movie_id)
 
     col1, col2 = st.columns([1,2])
 
     with col1:
         if data.get("poster_path"):
-            st.image(IMG_URL + data["poster_path"])
+            st.image(IMG + data["poster_path"])
 
     with col2:
         st.title(data.get("title"))
-        st.write(f"⭐ {data.get('vote_average')}")
+        st.write("⭐", data.get("vote_average"))
         st.write(data.get("overview"))
 
+        # WATCHLIST
         if st.button("❤️ Add to Watchlist"):
-            if data["title"] not in st.session_state.watchlist:
-                st.session_state.watchlist.append(data["title"])
-                st.success("Added!")
+            st.session_state.watchlist.append({
+                "title": data["title"],
+                "poster": data["poster_path"]
+            })
 
     # ===== BOX OFFICE =====
-    st.markdown("## 💰 Box Office & Budget")
+    st.markdown("## 💰 Box Office")
+
     revenue = data.get("revenue", 0)
     budget = data.get("budget", 0)
 
+    def money(x):
+        if x >= 1_000_000_000:
+            return f"${x/1e9:.2f}B"
+        elif x >= 1_000_000:
+            return f"${x/1e6:.2f}M"
+        return "N/A"
+
     c1, c2, c3 = st.columns(3)
-    c1.metric("🌍 Box Office", format_money(revenue))
-    c2.metric("🎬 Budget", format_money(budget))
-    c3.metric("📈 Profit", format_money(revenue - budget if revenue and budget else 0))
+    c1.metric("Revenue", money(revenue))
+    c2.metric("Budget", money(budget))
+    c3.metric("Profit", money(revenue - budget if revenue and budget else 0))
 
     # ===== TRAILER =====
-    trailer = get_trailer(movie_id)
     if trailer:
         st.markdown("## 🎬 Trailer")
         st.video(trailer)
 
     # ===== CAST =====
     st.markdown("## 🎭 Cast")
-    cols = st.columns(5)
-    for i, actor in enumerate(cast_data.get("cast", [])[:10]):
-        with cols[i % 5]:
-            if actor.get("profile_path"):
-                st.image(IMG_URL + actor["profile_path"])
-            st.caption(actor["name"])
+    cols = st.columns(6)
+
+    for i, c in enumerate(credits.get("cast", [])[:12]):
+        with cols[i % 6]:
+            if c.get("profile_path"):
+                st.image(IMG + c["profile_path"])
+            st.write(c["name"])
+
+    # ===== DIRECTOR =====
+    st.markdown("## 🎬 Director")
+    for crew in credits.get("crew", []):
+        if crew["job"] == "Director":
+            st.write(crew["name"])
 
     # ===== RECOMMENDATIONS =====
     st.markdown("## 🎯 Recommended")
-    recs = get_recommendations(movie_id)
 
-    cols = st.columns(5)
-    for i, movie in enumerate(recs):
-        with cols[i % 5]:
-            if movie.get("poster_path"):
-                st.image(IMG_URL + movie["poster_path"])
-            if st.button("View", key=f"r_{movie['id']}"):
-                st.session_state.selected_movie = movie["id"]
+    rec = get_recommendations(movie_id)
+    cols = st.columns(6)
+
+    for i, m in enumerate(rec.get("results", [])[:12]):
+        with cols[i % 6]:
+            if m.get("poster_path"):
+                st.image(IMG + m["poster_path"])
+            st.write(m["title"])
+            if st.button("View", key=f"rec{i}"):
+                st.session_state.movie_id = m["id"]
                 st.rerun()
+
+    if st.button("⬅ Back"):
+        st.session_state.page = "home"
+        st.rerun()

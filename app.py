@@ -125,36 +125,97 @@ h1, h2, h3, .stMarkdown h2 {
     border-radius: 2px;
 }
 
-/* ── MOVIE CARDS ── */
-[data-testid="stImage"] {
-    border-radius: 10px !important;
-    overflow: hidden !important;
-    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1) !important;
-    display: block !important;
-    position: relative !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-    cursor: pointer;
-}
-
-[data-testid="stImage"]:hover {
-    transform: translateY(-10px) scale(1.04) !important;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7),
-                0 0 25px rgba(255,157,92,0.15) !important;
-    border-radius: 12px !important;
-}
-
-[data-testid="stImage"] img {
-    transition: filter 0.4s ease !important;
-}
-
-[data-testid="stImage"]:hover img {
-    filter: brightness(1.08) saturate(1.1) !important;
-}
 
 /* ── COLUMNS ── */
 [data-testid="column"] {
     transition: transform 0.3s ease;
     position: relative;
+}
+
+/* ── POSTER CLICK OVERLAY ── */
+.poster-wrap {
+    position: relative;
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.poster-wrap:hover {
+    transform: translateY(-10px) scale(1.04);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 25px rgba(255,157,92,0.15);
+}
+
+.poster-wrap img {
+    width: 100%;
+    display: block;
+    border-radius: 10px;
+    transition: filter 0.4s ease;
+}
+
+.poster-wrap:hover img {
+    filter: brightness(1.08) saturate(1.1);
+}
+
+/* Overlay shimmer on hover */
+.poster-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,157,92,0.08), rgba(167,139,250,0.08));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    border-radius: 10px;
+}
+
+.poster-wrap:hover::after {
+    opacity: 1;
+}
+
+/* Movie title below poster */
+.poster-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    color: rgba(232,224,213,0.7);
+    text-align: center;
+    margin-top: 7px;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hide the invisible overlay button visually */
+.poster-btn-wrap {
+    position: relative;
+}
+
+.poster-btn-wrap .stButton {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.poster-btn-wrap .stButton > button {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    border-radius: 10px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    transform: none !important;
 }
 
 /* ── BUTTONS ── */
@@ -474,13 +535,23 @@ if st.session_state.page == "home":
         for i, m in enumerate(results.get("results", [])[:10]):
             with cols[i % 5]:
                 if m.get("poster_path"):
-                    st.image(IMG + m["poster_path"])
-                st.write(m.get("title", "Untitled"))
-
-                if st.button("View", key=f"search_{m['id']}"):
-                    st.session_state.movie_id = m["id"]
-                    st.session_state.page = "details"
-                    st.rerun()
+                    st.markdown(
+                        f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
+                        f'<div class="poster-title">{m.get("title", "Untitled")}</div>',
+                        unsafe_allow_html=True
+                    )
+                    st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
+                    if st.button("\u200b", key=f"search_{m['id']}"):
+                        st.session_state.movie_id = m["id"]
+                        st.session_state.page = "details"
+                        st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="poster-title">{m.get("title", "Untitled")}</div>', unsafe_allow_html=True)
+                    if st.button(m.get("title", "View"), key=f"search_{m['id']}"):
+                        st.session_state.movie_id = m["id"]
+                        st.session_state.page = "details"
+                        st.rerun()
 
     st.markdown('<div class="section-title">🔥 Trending This Week</div>', unsafe_allow_html=True)
 
@@ -491,13 +562,23 @@ if st.session_state.page == "home":
     for i, m in enumerate(trending.get("results", [])[:12]):
         with cols[i % 6]:
             if m.get("poster_path"):
-                st.image(IMG + m["poster_path"])
-            st.write(m.get("title", "Untitled"))
-
-            if st.button("View", key=f"trend_{i}"):
-                st.session_state.movie_id = m["id"]
-                st.session_state.page = "details"
-                st.rerun()
+                st.markdown(
+                    f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
+                    f'<div class="poster-title">{m.get("title", "Untitled")}</div>',
+                    unsafe_allow_html=True
+                )
+                st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
+                if st.button("\u200b", key=f"trend_{i}"):
+                    st.session_state.movie_id = m["id"]
+                    st.session_state.page = "details"
+                    st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="poster-title">{m.get("title", "Untitled")}</div>', unsafe_allow_html=True)
+                if st.button(m.get("title", "View"), key=f"trend_{i}"):
+                    st.session_state.movie_id = m["id"]
+                    st.session_state.page = "details"
+                    st.rerun()
 
     if st.session_state.watchlist:
         st.markdown('<div class="section-title">❤️ Your Watchlist</div>', unsafe_allow_html=True)
@@ -641,12 +722,21 @@ elif st.session_state.page == "details":
         for i, m in enumerate(rec.get("results", [])[:12]):
             with cols[i % 6]:
                 if m.get("poster_path"):
-                    st.image(IMG + m["poster_path"])
-                st.write(m.get("title", ""))
-
-                if st.button("View", key=f"rec_{i}"):
-                    st.session_state.movie_id = m["id"]
-                    st.rerun()
+                    st.markdown(
+                        f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
+                        f'<div class="poster-title">{m.get("title", "")}</div>',
+                        unsafe_allow_html=True
+                    )
+                    st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
+                    if st.button("\u200b", key=f"rec_{i}"):
+                        st.session_state.movie_id = m["id"]
+                        st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="poster-title">{m.get("title", "")}</div>', unsafe_allow_html=True)
+                    if st.button(m.get("title", "View"), key=f"rec_{i}"):
+                        st.session_state.movie_id = m["id"]
+                        st.rerun()
 
     # ── BACK ──
     st.markdown("---")

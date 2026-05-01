@@ -125,39 +125,121 @@ h1, h2, h3, .stMarkdown h2 {
     border-radius: 2px;
 }
 
-/* ── MOVIE CARDS ── */
-[data-testid="stImage"] {
-    border-radius: 10px !important;
-    overflow: hidden !important;
-    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1) !important;
-    display: block !important;
-    position: relative !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-    cursor: pointer;
-}
-
-[data-testid="stImage"]:hover {
-    transform: translateY(-10px) scale(1.04) !important;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7),
-                0 0 25px rgba(255,157,92,0.15) !important;
-    border-radius: 12px !important;
-}
-
-[data-testid="stImage"] img {
-    transition: filter 0.4s ease !important;
-}
-
-[data-testid="stImage"]:hover img {
-    filter: brightness(1.08) saturate(1.1) !important;
-}
-
-/* ── COLUMNS ── */
-[data-testid="column"] {
-    transition: transform 0.3s ease;
+/* ── POSTER CARD WRAPPER ── */
+.poster-card {
     position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    display: block;
+    width: 100%;
 }
 
-/* ── BUTTONS ── */
+.poster-card:hover {
+    transform: translateY(-10px) scale(1.04);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7),
+                0 0 25px rgba(255,157,92,0.2);
+}
+
+.poster-card img {
+    width: 100%;
+    display: block;
+    border-radius: 10px;
+    transition: filter 0.4s ease;
+}
+
+.poster-card:hover img {
+    filter: brightness(1.08) saturate(1.1);
+}
+
+/* Hover overlay with "tap to view" hint */
+.poster-card .poster-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(5,8,15,0.92) 0%,
+        rgba(5,8,15,0.3) 40%,
+        transparent 70%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px 10px 10px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    border-radius: 10px;
+}
+
+.poster-card:hover .poster-overlay {
+    opacity: 1;
+}
+
+.poster-overlay-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.poster-overlay-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,157,92,0.2);
+    border: 1px solid rgba(255,157,92,0.5);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: #ff9d5c;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    width: fit-content;
+    backdrop-filter: blur(4px);
+}
+
+/* ── POSTER CLICK BUTTON (invisible overlay) ── */
+.poster-click-btn {
+    position: relative;
+    width: 100%;
+}
+
+/* Hide the default Streamlit button styling — make it invisible overlay */
+.poster-click-btn .stButton > button {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    min-height: unset !important;
+}
+
+/* ── MOVIE TITLE BELOW POSTER ── */
+.stApp p {
+    font-family: 'Raleway', sans-serif !important;
+    color: rgba(232,224,213,0.8) !important;
+    font-size: 12px !important;
+    margin-top: 6px !important;
+    line-height: 1.4 !important;
+    text-align: center;
+}
+
+/* ── BUTTONS (non-poster) ── */
 .stButton > button {
     background: rgba(255,255,255,0.04) !important;
     border: 1px solid rgba(255,157,92,0.3) !important;
@@ -176,15 +258,6 @@ h1, h2, h3, .stMarkdown h2 {
     width: 100% !important;
 }
 
-.stButton > button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,157,92,0.15), rgba(167,139,250,0.1));
-    opacity: 0;
-    transition: opacity 0.35s ease;
-}
-
 .stButton > button:hover {
     border-color: rgba(255,157,92,0.7) !important;
     color: #fff !important;
@@ -192,23 +265,6 @@ h1, h2, h3, .stMarkdown h2 {
     box-shadow: 0 8px 25px rgba(255,157,92,0.2),
                 0 0 0 1px rgba(255,157,92,0.1) !important;
     background: rgba(255,157,92,0.08) !important;
-}
-
-.stButton > button:hover::before {
-    opacity: 1;
-}
-
-.stButton > button:active {
-    transform: translateY(0px) scale(0.97) !important;
-    box-shadow: 0 2px 10px rgba(255,157,92,0.15) !important;
-    transition: all 0.1s ease !important;
-}
-
-/* BACK BUTTON — special style */
-.stButton > button[kind="secondary"],
-.stApp .element-container:last-child .stButton > button {
-    border-color: rgba(167,139,250,0.4) !important;
-    color: #c4b5fd !important;
 }
 
 /* ── METRICS ── */
@@ -223,26 +279,10 @@ h1, h2, h3, .stMarkdown h2 {
     overflow: hidden;
 }
 
-[data-testid="stMetric"]::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,157,92,0.06) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
 [data-testid="stMetric"]:hover {
     transform: translateY(-5px);
     border-color: rgba(255,157,92,0.3);
     box-shadow: 0 12px 35px rgba(0,0,0,0.4), 0 0 20px rgba(255,157,92,0.08);
-}
-
-[data-testid="stMetric"]:hover::before {
-    opacity: 1;
 }
 
 [data-testid="stMetricValue"] {
@@ -257,16 +297,6 @@ h1, h2, h3, .stMarkdown h2 {
     font-size: 0.75rem !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase;
-}
-
-/* ── MOVIE TITLE TEXT ── */
-.stApp p {
-    font-family: 'Raleway', sans-serif !important;
-    color: rgba(232,224,213,0.8) !important;
-    font-size: 12px !important;
-    margin-top: 6px !important;
-    line-height: 1.4 !important;
-    text-align: center;
 }
 
 /* ── DETAILS PAGE ── */
@@ -287,7 +317,6 @@ h1, h2, h3, .stMarkdown h2 {
     100%{ opacity: 1; transform: translateY(0); }
 }
 
-/* Details page overview text */
 .stApp [data-testid="stMarkdownContainer"] p {
     font-size: 14px !important;
     line-height: 1.8 !important;
@@ -308,9 +337,7 @@ h1, h2, h3, .stMarkdown h2 {
     transition: transform 0.4s ease;
 }
 
-.stVideo:hover {
-    transform: scale(1.01);
-}
+.stVideo:hover { transform: scale(1.01); }
 
 /* ── DIVIDER ── */
 hr {
@@ -357,7 +384,6 @@ hr {
 [data-testid="column"] {
     animation: cardReveal 0.5s ease both;
 }
-
 [data-testid="column"]:nth-child(1) { animation-delay: 0.05s; }
 [data-testid="column"]:nth-child(2) { animation-delay: 0.10s; }
 [data-testid="column"]:nth-child(3) { animation-delay: 0.15s; }
@@ -371,23 +397,6 @@ hr {
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #ff9d5c, #a78bfa);
     border-radius: 3px;
-}
-
-/* ── RIPPLE ON CLICK ── */
-.stButton > button:active::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-    animation: rippleEffect 0.4s ease-out;
-}
-
-@keyframes rippleEffect {
-    0%   { transform: scale(0); opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
 }
 
 /* Rating star */
@@ -404,6 +413,17 @@ hr {
     color: #e8c97e;
     letter-spacing: 0.05em;
     margin-bottom: 12px;
+}
+
+/* Touch hint text below sections */
+.tap-hint {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    color: rgba(232,224,213,0.25);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 16px;
 }
 
 </style>
@@ -449,6 +469,57 @@ if "movie_id" not in st.session_state:
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
 
+# ================= HELPER: CLICKABLE POSTER CARD =================
+def poster_card(movie, key, cols_context=None):
+    """
+    Renders a clickable poster card with hover overlay.
+    The invisible Streamlit button is stacked over the HTML poster
+    using CSS so clicking the poster triggers navigation.
+    """
+    title = movie.get("title", "Untitled")
+    poster = movie.get("poster_path", "")
+    movie_id = movie.get("id")
+
+    # HTML poster with overlay (purely visual)
+    if poster:
+        poster_html = f"""
+        <div class="poster-card">
+            <img src="{IMG}{poster}" alt="{title}" />
+            <div class="poster-overlay">
+                <div class="poster-overlay-title">{title}</div>
+                <div class="poster-overlay-cta">▶ View Details</div>
+            </div>
+        </div>
+        """
+    else:
+        # Fallback: grey placeholder
+        poster_html = f"""
+        <div class="poster-card" style="background:rgba(255,255,255,0.05);
+             min-height:200px;display:flex;align-items:center;
+             justify-content:center;border:1px solid rgba(255,255,255,0.08);">
+            <span style="font-family:Cinzel,serif;font-size:11px;
+                  color:rgba(232,224,213,0.4);letter-spacing:0.1em;">NO POSTER</span>
+            <div class="poster-overlay">
+                <div class="poster-overlay-title">{title}</div>
+                <div class="poster-overlay-cta">▶ View Details</div>
+            </div>
+        </div>
+        """
+
+    # Wrap in a relative container — the invisible button will be positioned over it
+    st.markdown(f'<div class="poster-click-btn">', unsafe_allow_html=True)
+    st.markdown(poster_html, unsafe_allow_html=True)
+
+    # Invisible button overlaid via CSS — clicking the poster area clicks this
+    clicked = st.button("open", key=key, help=f"View {title}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    if clicked:
+        st.session_state.movie_id = movie_id
+        st.session_state.page = "details"
+        st.rerun()
+
 # ================= HEADER =================
 st.markdown("## 🎬 LUMORA")
 st.markdown(
@@ -469,20 +540,15 @@ if st.session_state.page == "home":
             results = search_movie(query)
 
         st.markdown('<div class="section-title">🔎 Results</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tap-hint">Click any poster to explore</div>', unsafe_allow_html=True)
         cols = st.columns(5)
 
         for i, m in enumerate(results.get("results", [])[:10]):
             with cols[i % 5]:
-                if m.get("poster_path"):
-                    st.image(IMG + m["poster_path"])
-                st.write(m.get("title", "Untitled"))
-
-                if st.button("View", key=f"search_{m['id']}"):
-                    st.session_state.movie_id = m["id"]
-                    st.session_state.page = "details"
-                    st.rerun()
+                poster_card(m, key=f"search_{m['id']}")
 
     st.markdown('<div class="section-title">🔥 Trending This Week</div>', unsafe_allow_html=True)
+    st.markdown('<div class="tap-hint">Click any poster to explore</div>', unsafe_allow_html=True)
 
     with st.spinner("Curating the reel…"):
         trending = get_trending()
@@ -490,14 +556,7 @@ if st.session_state.page == "home":
     cols = st.columns(6)
     for i, m in enumerate(trending.get("results", [])[:12]):
         with cols[i % 6]:
-            if m.get("poster_path"):
-                st.image(IMG + m["poster_path"])
-            st.write(m.get("title", "Untitled"))
-
-            if st.button("View", key=f"trend_{i}"):
-                st.session_state.movie_id = m["id"]
-                st.session_state.page = "details"
-                st.rerun()
+            poster_card(m, key=f"trend_{i}")
 
     if st.session_state.watchlist:
         st.markdown('<div class="section-title">❤️ Your Watchlist</div>', unsafe_allow_html=True)
@@ -509,9 +568,18 @@ if st.session_state.page == "home":
 
         for i, m in enumerate(st.session_state.watchlist):
             with cols[i % 6]:
-                if m.get("poster"):
-                    st.image(IMG + m["poster"])
-                st.write(m["title"])
+                # Watchlist items are stored differently — reconstruct a compatible dict
+                watchlist_movie = {
+                    "id": m.get("id"),
+                    "title": m.get("title"),
+                    "poster_path": m.get("poster"),
+                }
+                if watchlist_movie["id"]:
+                    poster_card(watchlist_movie, key=f"wl_{i}")
+                else:
+                    if m.get("poster"):
+                        st.image(IMG + m["poster"])
+                    st.write(m["title"])
 
 # ================= DETAILS =================
 elif st.session_state.page == "details":
@@ -558,6 +626,7 @@ elif st.session_state.page == "details":
         else:
             if st.button("❤️ Add to Watchlist"):
                 st.session_state.watchlist.append({
+                    "id": movie_id,
                     "title": data.get("title"),
                     "poster": data.get("poster_path")
                 })
@@ -636,17 +705,12 @@ elif st.session_state.page == "details":
     if rec.get("results"):
         st.markdown("---")
         st.markdown('<div class="section-title">🎯 You Might Also Like</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tap-hint">Click any poster to explore</div>', unsafe_allow_html=True)
 
         cols = st.columns(6)
         for i, m in enumerate(rec.get("results", [])[:12]):
             with cols[i % 6]:
-                if m.get("poster_path"):
-                    st.image(IMG + m["poster_path"])
-                st.write(m.get("title", ""))
-
-                if st.button("View", key=f"rec_{i}"):
-                    st.session_state.movie_id = m["id"]
-                    st.rerun()
+                poster_card(m, key=f"rec_{i}")
 
     # ── BACK ──
     st.markdown("---")

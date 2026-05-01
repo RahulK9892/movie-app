@@ -192,8 +192,9 @@ elif st.session_state.page == "details":
         st.markdown("## 🎬 Trailer")
         st.video(trailer)
 
-    # ===== SCREENSHOTS =====
-    st.markdown("## 📸 Screenshots")
+    # ===== SCENES (UPDATED LABEL) =====
+    st.markdown("## 🎬 Scenes from the Movie")
+    st.caption("Official stills and moments from the film")
 
     backdrops = images.get("backdrops", [])
 
@@ -203,7 +204,7 @@ elif st.session_state.page == "details":
             with cols[i % 3]:
                 st.image(BACKDROP + img["file_path"])
     else:
-        st.write("No screenshots available")
+        st.write("No scenes available")
 
     # ===== CAST =====
     st.markdown("## 🎭 Cast")

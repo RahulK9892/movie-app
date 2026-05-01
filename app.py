@@ -9,53 +9,26 @@ from sklearn.feature_extraction.text import CountVectorizer
 TMDB_API_KEY = "56bb6403529bf7858db4fb63d2d8ca55"
 BASE_IMG = "https://image.tmdb.org/t/p/w500"
 
-st.set_page_config(layout="wide", page_title="LUMORA NETFLIX")
+st.set_page_config(page_title="LUMORA FINAL", layout="wide")
 
 # ================= CSS =================
 st.markdown("""
 <style>
-/* Scroll Row */
-.scroll-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
-}
-.scroll-item {
-    flex: 0 0 auto;
-    width: 180px;
-    scroll-snap-align: start;
-}
-
-/* Movie Card */
 .movie-card {
-    position: relative;
+    text-align: center;
     cursor: pointer;
 }
 .movie-card img {
-    width: 100%;
-    border-radius: 10px;
+    border-radius: 12px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.movie-card:hover img {
-    transform: scale(1.1);
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
+.movie-card img:hover {
+    transform: scale(1.08);
+    box-shadow: 0px 12px 25px rgba(0,0,0,0.6);
 }
-
-/* Overlay (Netflix-style hover info) */
-.overlay {
-    position: absolute;
-    bottom: 0;
-    background: rgba(0,0,0,0.8);
-    width: 100%;
-    opacity: 0;
-    transition: 0.3s;
-    padding: 5px;
-    font-size: 12px;
-}
-.movie-card:hover .overlay {
-    opacity: 1;
+.movie-title {
+    font-size: 14px;
+    font-weight: 600;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -108,46 +81,42 @@ def recommend(title, df, sim):
     scores = sorted(list(enumerate(sim[idx])), key=lambda x:x[1], reverse=True)[1:6]
     return [df.iloc[i[0]].title for i in scores]
 
-# ================= NETFLIX ROW =================
-def netflix_row(title, movies):
-    st.markdown(f"## {title}")
-    html = '<div class="scroll-container">'
+# ================= CARD =================
+def movie_card(movie, key):
+    if movie.get("poster_path"):
+        st.markdown(f"""
+        <div class="movie-card">
+            <img src="{BASE_IMG + movie['poster_path']}">
+            <div class="movie-title">{movie['title']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    for m in movies[:10]:
-        if m.get("poster_path"):
-            html += f"""
-            <div class="scroll-item">
-                <div class="movie-card">
-                    <img src="{BASE_IMG + m['poster_path']}">
-                    <div class="overlay">{m['title']}</div>
-                </div>
-            </div>
-            """
-
-    html += "</div>"
-    st.markdown(html, unsafe_allow_html=True)
-
-    # buttons below row (for click)
-    cols = st.columns(len(movies[:10]))
-    for i, m in enumerate(movies[:10]):
-        with cols[i]:
-            if st.button("▶", key=f"{title}_{m['id']}"):
-                st.session_state.movie_id = m["id"]
-                st.session_state.page = "movie"
-                st.rerun()
+    if st.button("▶ View", key=key):
+        st.session_state.movie_id = movie["id"]
+        st.session_state.page = "movie"
+        st.rerun()
 
 # ================= HOME =================
 if st.session_state.page == "home":
 
-    st.title("🎬 LUMORA (Netflix UI)")
+    st.title("🎬 LUMORA")
 
     trending = get_movies("popular")
     top = get_movies("top_rated")
 
-    netflix_row("🔥 Trending", trending.get("results", []))
-    netflix_row("⭐ Top Rated", top.get("results", []))
+    st.markdown("## 🔥 Trending")
+    cols = st.columns(5)
+    for i, m in enumerate(trending.get("results", [])[:10]):
+        with cols[i % 5]:
+            movie_card(m, f"t{i}")
 
-# ================= MOVIE =================
+    st.markdown("## ⭐ Top Rated")
+    cols = st.columns(5)
+    for i, m in enumerate(top.get("results", [])[:10]):
+        with cols[i % 5]:
+            movie_card(m, f"tr{i}")
+
+# ================= MOVIE PAGE =================
 if st.session_state.page == "movie":
 
     data = get_movie(st.session_state.movie_id)
@@ -170,7 +139,7 @@ if st.session_state.page == "movie":
         st.write(data.get("overview"))
 
     # GRAPH
-    st.markdown("## 📊 Ratings")
+    st.markdown("## 📊 Rating Graph")
     fig, ax = plt.subplots()
     ax.plot([rating, rating-1, rating+0.5])
     st.pyplot(fig)
@@ -181,16 +150,16 @@ if st.session_state.page == "movie":
         st.video(trailer)
 
     # SCENES
-    st.markdown("## 🎞️ Scenes")
+    st.markdown("## 🎞️ Movie Scenes")
     imgs = get_images(data["id"])
 
     cols = st.columns(3)
     for i, img in enumerate(imgs.get("backdrops", [])[:6]):
-        with cols[i%3]:
+        with cols[i % 3]:
             st.image(BASE_IMG + img["file_path"])
 
     # AI
-    st.markdown("## 🧠 AI Recommended")
+    st.markdown("## 🧠 AI Recommendations")
     popular = get_movies("popular").get("results", [])
     df, sim = build_ai(popular)
 

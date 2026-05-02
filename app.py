@@ -125,54 +125,67 @@ h1, h2, h3, .stMarkdown h2 {
     border-radius: 2px;
 }
 
-
-/* ── COLUMNS ── */
-[data-testid="column"] {
-    transition: transform 0.3s ease;
+/* ── POSTER CARD ── */
+.poster-card {
     position: relative;
-}
-
-/* ── POSTER CLICK OVERLAY ── */
-.poster-wrap {
-    position: relative;
-    display: block;
     border-radius: 10px;
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    background: #0d1117;
+    margin-bottom: 4px;
 }
 
-.poster-wrap:hover {
-    transform: translateY(-10px) scale(1.04);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 25px rgba(255,157,92,0.15);
+.poster-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 25px rgba(255,157,92,0.2);
 }
 
-.poster-wrap img {
+.poster-card img {
     width: 100%;
     display: block;
     border-radius: 10px;
     transition: filter 0.4s ease;
 }
 
-.poster-wrap:hover img {
-    filter: brightness(1.08) saturate(1.1);
-}
-
-/* Overlay shimmer on hover */
-.poster-wrap::after {
-    content: '';
+/* Hover overlay with "View Details" */
+.poster-card .poster-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,157,92,0.08), rgba(167,139,250,0.08));
+    background: linear-gradient(
+        to top,
+        rgba(5,8,15,0.95) 0%,
+        rgba(5,8,15,0.5) 50%,
+        rgba(5,8,15,0.1) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 10px;
     opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
+    transition: opacity 0.35s ease;
     border-radius: 10px;
 }
 
-.poster-wrap:hover::after {
+.poster-card:hover .poster-overlay {
     opacity: 1;
+}
+
+.poster-overlay .view-btn-text {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255,157,92,0.9), rgba(167,139,250,0.9));
+    border-radius: 20px;
+    padding: 6px 14px;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(255,157,92,0.3);
 }
 
 /* Movie title below poster */
@@ -181,7 +194,8 @@ h1, h2, h3, .stMarkdown h2 {
     font-size: 11px;
     color: rgba(232,224,213,0.7);
     text-align: center;
-    margin-top: 7px;
+    margin-top: 6px;
+    margin-bottom: 2px;
     letter-spacing: 0.04em;
     line-height: 1.4;
     white-space: nowrap;
@@ -189,36 +203,40 @@ h1, h2, h3, .stMarkdown h2 {
     text-overflow: ellipsis;
 }
 
-/* Hide the invisible overlay button visually */
-.poster-btn-wrap {
+/* ── MOVIE CARD BUTTON — the actual Streamlit button styled as full-card click ── */
+.movie-card-container {
     position: relative;
+    margin-bottom: 16px;
 }
 
-.poster-btn-wrap .stButton {
+/* Make the Streamlit button cover the entire poster card area */
+.movie-card-container .stButton {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    z-index: 10;
+    z-index: 20;
 }
 
-.poster-btn-wrap .stButton > button {
-    position: absolute !important;
-    top: 0 !important; left: 0 !important;
+.movie-card-container .stButton > button {
     width: 100% !important;
     height: 100% !important;
     opacity: 0 !important;
-    border-radius: 10px !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     padding: 0 !important;
     margin: 0 !important;
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
     cursor: pointer !important;
+    border-radius: 10px !important;
     transform: none !important;
+    min-height: 200px !important;
 }
 
-/* ── BUTTONS ── */
+/* ── VISIBLE BUTTONS (non-poster) ── */
 .stButton > button {
     background: rgba(255,255,255,0.04) !important;
     border: 1px solid rgba(255,157,92,0.3) !important;
@@ -237,39 +255,17 @@ h1, h2, h3, .stMarkdown h2 {
     width: 100% !important;
 }
 
-.stButton > button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,157,92,0.15), rgba(167,139,250,0.1));
-    opacity: 0;
-    transition: opacity 0.35s ease;
-}
-
 .stButton > button:hover {
     border-color: rgba(255,157,92,0.7) !important;
     color: #fff !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(255,157,92,0.2),
-                0 0 0 1px rgba(255,157,92,0.1) !important;
+    box-shadow: 0 8px 25px rgba(255,157,92,0.2) !important;
     background: rgba(255,157,92,0.08) !important;
-}
-
-.stButton > button:hover::before {
-    opacity: 1;
 }
 
 .stButton > button:active {
     transform: translateY(0px) scale(0.97) !important;
-    box-shadow: 0 2px 10px rgba(255,157,92,0.15) !important;
     transition: all 0.1s ease !important;
-}
-
-/* BACK BUTTON — special style */
-.stButton > button[kind="secondary"],
-.stApp .element-container:last-child .stButton > button {
-    border-color: rgba(167,139,250,0.4) !important;
-    color: #c4b5fd !important;
 }
 
 /* ── METRICS ── */
@@ -280,30 +276,12 @@ h1, h2, h3, .stMarkdown h2 {
     padding: 18px 20px !important;
     backdrop-filter: blur(16px);
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-[data-testid="stMetric"]::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,157,92,0.06) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
 }
 
 [data-testid="stMetric"]:hover {
     transform: translateY(-5px);
     border-color: rgba(255,157,92,0.3);
     box-shadow: 0 12px 35px rgba(0,0,0,0.4), 0 0 20px rgba(255,157,92,0.08);
-}
-
-[data-testid="stMetric"]:hover::before {
-    opacity: 1;
 }
 
 [data-testid="stMetricValue"] {
@@ -348,7 +326,6 @@ h1, h2, h3, .stMarkdown h2 {
     100%{ opacity: 1; transform: translateY(0); }
 }
 
-/* Details page overview text */
 .stApp [data-testid="stMarkdownContainer"] p {
     font-size: 14px !important;
     line-height: 1.8 !important;
@@ -366,11 +343,6 @@ h1, h2, h3, .stMarkdown h2 {
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    transition: transform 0.4s ease;
-}
-
-.stVideo:hover {
-    transform: scale(1.01);
 }
 
 /* ── DIVIDER ── */
@@ -434,23 +406,6 @@ hr {
     border-radius: 3px;
 }
 
-/* ── RIPPLE ON CLICK ── */
-.stButton > button:active::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-    animation: rippleEffect 0.4s ease-out;
-}
-
-@keyframes rippleEffect {
-    0%   { transform: scale(0); opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
-}
-
 /* Rating star */
 .rating-pill {
     display: inline-flex;
@@ -467,8 +422,35 @@ hr {
     margin-bottom: 12px;
 }
 
+/* ── POSTER CLICK BUTTON — visible "▶ View" pill below poster ── */
+div[data-testid="stVerticalBlock"] .poster-view-btn > div > button {
+    background: linear-gradient(135deg, rgba(255,157,92,0.12), rgba(167,139,250,0.12)) !important;
+    border: 1px solid rgba(255,157,92,0.4) !important;
+    border-radius: 20px !important;
+    color: #e8c97e !important;
+    font-family: 'Cinzel', serif !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.18em !important;
+    padding: 5px 0 !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(8px) !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+div[data-testid="stVerticalBlock"] .poster-view-btn > div > button:hover {
+    background: linear-gradient(135deg, rgba(255,157,92,0.25), rgba(167,139,250,0.2)) !important;
+    border-color: rgba(255,157,92,0.8) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(255,157,92,0.25) !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ================= API FUNCTIONS =================
 def fetch(url):
@@ -502,6 +484,35 @@ def get_recommendations(movie_id):
 def get_images(movie_id):
     return fetch(f"{BASE_URL}/movie/{movie_id}/images?api_key={TMDB_API_KEY}")
 
+
+# ================= HELPER: render a movie card =================
+def movie_card(m, btn_key):
+    """
+    Renders a poster image + title + a styled '▶ VIEW' button.
+    Returns True if the button was clicked.
+    """
+    if m.get("poster_path"):
+        st.markdown(
+            f'<div class="poster-card">'
+            f'  <img src="{IMG + m["poster_path"]}" />'
+            f'  <div class="poster-overlay"><span class="view-btn-text">▶ VIEW</span></div>'
+            f'</div>'
+            f'<div class="poster-title">{m.get("title", "Untitled")}</div>',
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            f'<div class="poster-title" style="padding:40px 0;">{m.get("title","Untitled")}</div>',
+            unsafe_allow_html=True
+        )
+
+    # Styled pill button — always visible, clearly clickable
+    st.markdown('<div class="poster-view-btn">', unsafe_allow_html=True)
+    clicked = st.button("▶  VIEW", key=btn_key)
+    st.markdown('</div>', unsafe_allow_html=True)
+    return clicked
+
+
 # ================= SESSION =================
 if "page" not in st.session_state:
     st.session_state.page = "home"
@@ -509,6 +520,7 @@ if "movie_id" not in st.session_state:
     st.session_state.movie_id = None
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
+
 
 # ================= HEADER =================
 st.markdown("## 🎬 LUMORA")
@@ -522,6 +534,7 @@ st.markdown(
 
 query = st.text_input("🔍 Search for a film…", placeholder="e.g. Inception, Parasite, Dune…")
 
+
 # ================= HOME =================
 if st.session_state.page == "home":
 
@@ -534,24 +547,10 @@ if st.session_state.page == "home":
 
         for i, m in enumerate(results.get("results", [])[:10]):
             with cols[i % 5]:
-                if m.get("poster_path"):
-                    st.markdown(
-                        f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
-                        f'<div class="poster-title">{m.get("title", "Untitled")}</div>',
-                        unsafe_allow_html=True
-                    )
-                    st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
-                    if st.button("\u200b", key=f"search_{m['id']}"):
-                        st.session_state.movie_id = m["id"]
-                        st.session_state.page = "details"
-                        st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="poster-title">{m.get("title", "Untitled")}</div>', unsafe_allow_html=True)
-                    if st.button(m.get("title", "View"), key=f"search_{m['id']}"):
-                        st.session_state.movie_id = m["id"]
-                        st.session_state.page = "details"
-                        st.rerun()
+                if movie_card(m, f"search_{m['id']}"):
+                    st.session_state.movie_id = m["id"]
+                    st.session_state.page = "details"
+                    st.rerun()
 
     st.markdown('<div class="section-title">🔥 Trending This Week</div>', unsafe_allow_html=True)
 
@@ -561,24 +560,10 @@ if st.session_state.page == "home":
     cols = st.columns(6)
     for i, m in enumerate(trending.get("results", [])[:12]):
         with cols[i % 6]:
-            if m.get("poster_path"):
-                st.markdown(
-                    f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
-                    f'<div class="poster-title">{m.get("title", "Untitled")}</div>',
-                    unsafe_allow_html=True
-                )
-                st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
-                if st.button("\u200b", key=f"trend_{i}"):
-                    st.session_state.movie_id = m["id"]
-                    st.session_state.page = "details"
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="poster-title">{m.get("title", "Untitled")}</div>', unsafe_allow_html=True)
-                if st.button(m.get("title", "View"), key=f"trend_{i}"):
-                    st.session_state.movie_id = m["id"]
-                    st.session_state.page = "details"
-                    st.rerun()
+            if movie_card(m, f"trend_{i}"):
+                st.session_state.movie_id = m["id"]
+                st.session_state.page = "details"
+                st.rerun()
 
     if st.session_state.watchlist:
         st.markdown('<div class="section-title">❤️ Your Watchlist</div>', unsafe_allow_html=True)
@@ -587,12 +572,12 @@ if st.session_state.page == "home":
             unsafe_allow_html=True
         )
         cols = st.columns(6)
-
         for i, m in enumerate(st.session_state.watchlist):
             with cols[i % 6]:
                 if m.get("poster"):
                     st.image(IMG + m["poster"])
                 st.write(m["title"])
+
 
 # ================= DETAILS =================
 elif st.session_state.page == "details":
@@ -600,10 +585,10 @@ elif st.session_state.page == "details":
     movie_id = st.session_state.movie_id
 
     with st.spinner("Pulling from the vault…"):
-        data     = get_details(movie_id)
-        credits  = get_credits(movie_id)
-        trailer  = get_trailer(movie_id)
-        images   = get_images(movie_id)
+        data    = get_details(movie_id)
+        credits = get_credits(movie_id)
+        trailer = get_trailer(movie_id)
+        images  = get_images(movie_id)
 
     col1, col2 = st.columns([1, 2])
 
@@ -674,7 +659,6 @@ elif st.session_state.page == "details":
         st.markdown("---")
         st.markdown('<div class="section-title">🖼️ Scenes from the Film</div>', unsafe_allow_html=True)
         st.caption("Official stills and cinematic moments")
-
         cols = st.columns(3)
         for i, img in enumerate(backdrops[:6]):
             with cols[i % 3]:
@@ -700,7 +684,6 @@ elif st.session_state.page == "details":
     if director:
         st.markdown("---")
         st.markdown('<div class="section-title">🎬 Director</div>', unsafe_allow_html=True)
-
         col1, col2 = st.columns([1, 4])
         with col1:
             if director.get("profile_path"):
@@ -721,22 +704,9 @@ elif st.session_state.page == "details":
         cols = st.columns(6)
         for i, m in enumerate(rec.get("results", [])[:12]):
             with cols[i % 6]:
-                if m.get("poster_path"):
-                    st.markdown(
-                        f'<div class="poster-wrap"><img src="{IMG + m["poster_path"]}" /></div>'
-                        f'<div class="poster-title">{m.get("title", "")}</div>',
-                        unsafe_allow_html=True
-                    )
-                    st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
-                    if st.button("\u200b", key=f"rec_{i}"):
-                        st.session_state.movie_id = m["id"]
-                        st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="poster-title">{m.get("title", "")}</div>', unsafe_allow_html=True)
-                    if st.button(m.get("title", "View"), key=f"rec_{i}"):
-                        st.session_state.movie_id = m["id"]
-                        st.rerun()
+                if movie_card(m, f"rec_{i}"):
+                    st.session_state.movie_id = m["id"]
+                    st.rerun()
 
     # ── BACK ──
     st.markdown("---")

@@ -855,17 +855,7 @@ def render_tv_row(shows, key_prefix, max_count=12, ncols=6):
                 go_detail(m["id"])  # reuse detail page for TV too
 
 
-def render_filter_tabs(options, current, key_prefix):
-    """Render filter tab buttons, return selected value or None"""
-    cols = st.columns(len(options))
-    selected = None
-    for i, (label, val) in enumerate(options):
-        with cols[i]:
-            is_active = (current == val)
-            btn_style = "filter-tab-active" if is_active else "filter-tab"
-            if st.button(label, key=f"{key_prefix}_filter_{val}"):
-                selected = val
-    return selected
+def render_movie_row(movies, key_prefix, max_count=12, ncols=6):
     cols = st.columns(ncols)
     for i, m in enumerate(movies[:max_count]):
         with cols[i % ncols]:

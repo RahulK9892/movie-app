@@ -545,11 +545,6 @@ if st.session_state.page == "home":
                         st.session_state.movie_id = m["id"]
                         st.session_state.page = "details"
                         st.rerun()
-                    st.markdown(
-                        f'<div class="poster-wrap"><img src="{IMG +m["poster_path"]}" /></div>'
-                        f'<div class="poster-title">{m.get("title","Untitled")}</div>',
-                        unsafe_allow_html=True
-                    )
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:
                     st.markdown(f'<div class="poster-title">{m.get("title", "Untitled")}</div>', unsafe_allow_html=True)
@@ -735,7 +730,6 @@ elif st.session_state.page == "details":
                     st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
                     if st.button("\u200b", key=f"rec_{i}"):
                         st.session_state.movie_id = m["id"]
-                        st.session_state.page = "details"
                         st.rerun()
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:

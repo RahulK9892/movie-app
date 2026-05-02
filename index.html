@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMORA — Cinema Rediscovered</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/lumora.css" />
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════════════════ -->
+  <nav class="l-nav" id="navbar">
+    <a class="l-logo" href="#" data-page="home">LUMORA</a>
+
+    <div class="nav-links">
+      <a class="nav-link active" href="#" data-page="home" data-nav="Browse">Browse</a>
+      <a class="nav-link" href="#" data-page="movies" data-nav="Movies">Movies</a>
+      <a class="nav-link" href="#" data-page="series" data-nav="Series">Series</a>
+      <a class="nav-link" href="#" data-page="mylist" data-nav="My List">
+        My List <span class="wl-count-badge" id="navWlCount" style="display:none"></span>
+      </a>
+    </div>
+
+    <div class="nav-right">
+      <div class="search-pill" id="searchToggle">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search movies, series…" autocomplete="off" />
+        <button class="search-clear" id="searchClear" style="display:none">✕</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ PAGES ════════════════════════════════════════════════════════ -->
+
+  <!-- HOME PAGE -->
+  <div class="page" id="page-home">
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-backdrop" id="heroBg"></div>
+      <div class="hero-gradient"></div>
+      <div class="hero-content" id="heroContent">
+        <div class="hero-badge">🔥 Trending #1 This Week</div>
+        <h1 class="hero-title" id="heroTitle"></h1>
+        <div class="hero-meta" id="heroMeta"></div>
+        <p class="hero-overview" id="heroOverview"></p>
+        <div class="hero-actions">
+          <button class="btn-primary" id="heroDetails">▶ View Details</button>
+          <button class="btn-ghost" id="heroWatchlist">＋ My List</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rows -->
+    <section class="content-section">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label">🔥 Trending This Week</span></div>
+      <div class="card-row" id="rowTrending"></div>
+      <div class="row-pagination" id="paginationTrending"></div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label">🎬 Now In Cinemas</span></div>
+      <div class="card-row" id="rowNowPlaying"></div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label">⭐ Top Rated All Time</span></div>
+      <div class="card-row" id="rowTopRated"></div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label">🌟 Popular Right Now</span></div>
+      <div class="card-row" id="rowPopular"></div>
+    </section>
+
+    <section class="content-section" id="myListSection" style="display:none">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label">❤️ My List <span class="sh-count" id="myListCount"></span></span></div>
+      <div class="card-row" id="rowMyList"></div>
+    </section>
+
+    <!-- Search results overlay -->
+    <section class="content-section" id="searchSection" style="display:none">
+      <div class="section-header"><span class="sh-bar"></span><span class="sh-label" id="searchLabel">🔎 Results</span></div>
+      <div class="card-row" id="rowSearch"></div>
+      <div class="row-pagination" id="paginationSearch"></div>
+    </section>
+
+  </div><!-- /home -->
+
+
+  <!-- MOVIES PAGE -->
+  <div class="page hidden" id="page-movies">
+    <div class="page-hero-banner">
+      <h1 class="page-title">Movies</h1>
+      <div class="filter-tabs" id="movieFilters">
+        <button class="filter-tab active" data-filter="popular">🌟 Popular</button>
+        <button class="filter-tab" data-filter="top_rated">⭐ Top Rated</button>
+        <button class="filter-tab" data-filter="now_playing">🎬 Now Playing</button>
+        <button class="filter-tab" data-filter="upcoming">🗓 Upcoming</button>
+      </div>
+    </div>
+    <section class="content-section">
+      <div class="card-grid" id="movieGrid"></div>
+      <div class="row-pagination" id="paginationMovies"></div>
+    </section>
+  </div>
+
+
+  <!-- SERIES PAGE -->
+  <div class="page hidden" id="page-series">
+    <div class="page-hero-banner">
+      <h1 class="page-title">Series</h1>
+      <div class="filter-tabs" id="seriesFilters">
+        <button class="filter-tab active" data-filter="popular">🌟 Popular</button>
+        <button class="filter-tab" data-filter="top_rated">⭐ Top Rated</button>
+        <button class="filter-tab" data-filter="on_the_air">📡 On The Air</button>
+        <button class="filter-tab" data-filter="trending">🔥 Trending</button>
+      </div>
+    </div>
+    <section class="content-section">
+      <div class="card-grid" id="seriesGrid"></div>
+      <div class="row-pagination" id="paginationSeries"></div>
+    </section>
+  </div>
+
+
+  <!-- MY LIST PAGE -->
+  <div class="page hidden" id="page-mylist">
+    <div class="page-hero-banner">
+      <h1 class="page-title">My List</h1>
+      <p class="page-subtitle" id="mylistSubtitle"></p>
+    </div>
+    <section class="content-section">
+      <div class="card-grid" id="mylistGrid"></div>
+      <div class="mylist-empty" id="mylistEmpty" style="display:none">
+        <div class="empty-icon">🎬</div>
+        <div class="empty-title">Your list is empty</div>
+        <div class="empty-sub">Browse movies and series and add them to your list.</div>
+        <div class="empty-actions">
+          <button class="btn-primary" data-page="movies">Browse Movies</button>
+          <button class="btn-ghost" data-page="series">Browse Series</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <!-- DETAIL PAGE -->
+  <div class="page hidden" id="page-detail">
+    <button class="back-btn" id="backBtn">← Back</button>
+
+    <!-- Detail Hero -->
+    <div class="detail-hero" id="detailHero">
+      <div class="detail-backdrop" id="detailBg"></div>
+      <div class="detail-gradient"></div>
+      <div class="detail-content">
+        <div class="detail-poster-wrap" id="detailPosterWrap"></div>
+        <div class="detail-info" id="detailInfo"></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="detail-actions" id="detailActions"></div>
+
+    <!-- Stats -->
+    <div class="stat-row" id="detailStats"></div>
+
+    <!-- Cast -->
+    <div class="dsh" id="castHeader" style="display:none">
+      <div class="dsh-bar"></div><div class="dsh-txt">🎭 Cast</div>
+    </div>
+    <div class="cast-grid" id="castGrid"></div>
+
+    <!-- Director -->
+    <div class="director-wrap" id="directorWrap" style="display:none"></div>
+
+    <!-- Trailer -->
+    <div class="dsh" id="trailerHeader" style="display:none">
+      <div class="dsh-bar"></div><div class="dsh-txt">▶ Official Trailer</div>
+    </div>
+    <div class="video-wrap" id="trailerWrap"></div>
+
+    <!-- Scenes -->
+    <div class="dsh" id="scenesHeader" style="display:none">
+      <div class="dsh-bar"></div><div class="dsh-txt">🖼 Scenes from the Film</div>
+    </div>
+    <div class="scene-grid" id="sceneGrid"></div>
+
+    <!-- Recommendations -->
+    <div class="dsh" id="recHeader" style="display:none">
+      <div class="dsh-bar"></div><div class="dsh-txt">🎯 You Might Also Like</div>
+    </div>
+    <div class="card-row" id="rowRec"></div>
+    <div class="row-pagination" id="paginationRec"></div>
+
+    <footer class="l-footer">LUMORA &nbsp;·&nbsp; Cinema Rediscovered &nbsp;·&nbsp; Powered by TMDB</footer>
+  </div><!-- /detail -->
+
+  <!-- ══ LOADER ════════════════════════════════════════════════════════ -->
+  <div class="global-loader" id="globalLoader">
+    <div class="loader-ring"></div>
+  </div>
+
+  <!-- ══ TOAST ═════════════════════════════════════════════════════════ -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/js/lumora.js"></script>
+</body>
+</html>

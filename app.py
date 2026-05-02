@@ -730,6 +730,7 @@ elif st.session_state.page == "details":
                     st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
                     if st.button("\u200b", key=f"rec_{i}"):
                         st.session_state.movie_id = m["id"]
+                        st.session_state.page = "details"
                         st.rerun()
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:

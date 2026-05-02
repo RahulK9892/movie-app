@@ -1484,7 +1484,7 @@ with col2:
 with col3:
     if st.button("Next Page ➡"):
         st.session_state.rec_page += 1
-        st.rerun(
+        st.rerun()
                 else:
                     st.markdown(f'<div class="poster-title">{m.get("title", "")}</div>', unsafe_allow_html=True)
                     if st.button(m.get("title", "View"), key=f"rec_{i}"):

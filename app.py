@@ -1469,22 +1469,22 @@ elif st.session_state.page == "details":
                     st.markdown('</div>', unsafe_allow_html=True)
                     col1, col2, col3 = st.columns([1,2,1])
 
-with col1:
-    if st.session_state.rec_page > 1:
-        if st.button("⬅ Prev Page"):
-            st.session_state.rec_page -= 1
-            st.rerun()
+                   with col1:
+                  if st.session_state.rec_page > 1:
+                  if st.button("⬅ Prev Page"):
+                     st.session_state.rec_page -= 1
+                     st.rerun()
 
-with col2:
-    st.markdown(
-        f"<p style='text-align:center;'>Page {st.session_state.rec_page}</p>",
-        unsafe_allow_html=True
-    )
+                  with col2:
+                    st.markdown(
+                    f"<p style='text-align:center;'>Page {st.session_state.rec_page}</p>",
+                    unsafe_allow_html=True
+                       )
 
-with col3:
-    if st.button("Next Page ➡"):
-        st.session_state.rec_page += 1
-        st.rerun()
+                 with col3:
+                 if st.button("Next Page ➡"):
+                    st.session_state.rec_page += 1
+                    st.rerun()
                 else:
                     st.markdown(f'<div class="poster-title">{m.get("title", "")}</div>', unsafe_allow_html=True)
                     if st.button(m.get("title", "View"), key=f"rec_{i}"):

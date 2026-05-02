@@ -258,6 +258,8 @@ html, body, .stApp {
     position: absolute !important;
     inset: 0 !important;
     z-index: 10 !important;
+    height: 100% !important;
+    overflow: hidden !important;
 }
 .poster-click-wrap [data-testid="stButton"] > button {
     position: absolute !important;
@@ -270,9 +272,128 @@ html, body, .stApp {
     border-radius: 6px !important;
     opacity: 0 !important;
     min-height: unset !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+/* Kill the empty space/gap left by the button container */
+.poster-click-wrap > div:last-child {
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100% !important;
+}
+/* Remove bottom margin/padding from stButton inside card wraps */
+.poster-click-wrap [data-testid="stButton"] { margin: 0 !important; padding: 0 !important; }
+
+/* CRITICAL: collapse the gap Streamlit adds after the invisible button */
+.poster-click-wrap {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+.poster-click-wrap > div {
+    margin-bottom: 0 !important;
+}
+/* The stColumn that contains poster-click-wrap should not grow */
+[data-testid="stColumn"]:has(.poster-click-wrap) {
+    overflow: hidden !important;
 }
 
-/* ── GENERAL BTN ── */
+/* ── NAV CLICK ROW (invisible Streamlit buttons over visual nav) ── */
+.nav-click-row {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    z-index: 10000 !important;
+    display: flex !important;
+    align-items: center !important;
+    pointer-events: none !important;
+    background: transparent !important;
+}
+/* Target the horizontal block containing nav buttons */
+div:has(> .nav-click-row) { position: static !important; }
+
+/* Make nav row buttons transparent and properly positioned */
+.nav-click-row [data-testid="stHorizontalBlock"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    z-index: 10000 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 48px !important;
+    background: transparent !important;
+    gap: 0 !important;
+    pointer-events: all !important;
+}
+.nav-click-row [data-testid="stButton"] > button {
+    background: transparent !important;
+    border: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    padding: 0 !important;
+    min-height: 64px !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    opacity: 0 !important;
+}
+.nav-click-row [data-testid="stColumn"] {
+    padding: 0 !important;
+    flex: unset !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.nav-btn-wrap {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+.nav-btn-wrap [data-testid="stButton"] > button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: rgba(255,255,255,0.65) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.04em !important;
+    padding: 4px 0 !important;
+    width: auto !important;
+    min-height: unset !important;
+    cursor: pointer !important;
+    transition: color 0.2s !important;
+}
+.nav-btn-wrap [data-testid="stButton"] > button:hover {
+    color: #fff !important;
+    background: transparent !important;
+    border: none !important;
+}
+.nav-btn-wrap .nav-active [data-testid="stButton"] > button {
+    color: #fff !important;
+    border-bottom: 2px solid #ff9d5c !important;
+    padding-bottom: 2px !important;
+}
+
+/* ── SEARCH NAV BTN ── */
+.nav-search-btn-wrap [data-testid="stButton"] > button {
+    background: rgba(255,255,255,0.07) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 20px !important;
+    color: rgba(255,255,255,0.45) !important;
+    font-size: 12px !important;
+    padding: 6px 14px !important;
+    width: auto !important;
+    min-height: unset !important;
+}
+.nav-search-btn-wrap [data-testid="stButton"] > button:hover {
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+}
 .stButton > button {
     background: rgba(255,255,255,0.05) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
@@ -503,7 +624,27 @@ hr { display:none!important; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius:3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,157,92,0.35); }
 
-/* ── REC GRID WRAP ── */
+/* ── FILTER TABS ── */
+.filter-tab-row { padding: 80px 48px 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+.stButton.filter-tab > button, .stButton.filter-tab-active > button {
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 6px 18px !important;
+    min-height: unset !important;
+    width: auto !important;
+    letter-spacing: 0.04em !important;
+}
+/* Page title style */
+.page-title {
+    font-size: 1.8rem; font-weight: 700; color: #fff;
+    padding: 80px 48px 8px;
+    font-family: 'Inter', sans-serif;
+}
+.page-subtitle {
+    font-size: 13px; color: rgba(255,255,255,0.4);
+    padding: 0 48px 24px;
+}
 .rec-grid-wrap { padding: 0 48px 32px; }
 
 /* ── FOOTER ── */
@@ -557,7 +698,43 @@ def get_recommendations(movie_id):
 def get_images(movie_id):
     return fetch(f"{BASE_URL}/movie/{movie_id}/images?api_key={TMDB_API_KEY}")
 
-def fmt_money(x):
+def get_upcoming(page=1):
+    return fetch(f"{BASE_URL}/movie/upcoming?api_key={TMDB_API_KEY}&page={page}")
+
+def get_top_rated_paged(page=1):
+    return fetch(f"{BASE_URL}/movie/top_rated?api_key={TMDB_API_KEY}&page={page}")
+
+def get_now_playing_paged(page=1):
+    return fetch(f"{BASE_URL}/movie/now_playing?api_key={TMDB_API_KEY}&page={page}")
+
+def get_popular_paged(page=1):
+    return fetch(f"{BASE_URL}/movie/popular?api_key={TMDB_API_KEY}&page={page}")
+
+# Series (TV) helpers
+def get_tv_popular(page=1):
+    return fetch(f"{BASE_URL}/tv/popular?api_key={TMDB_API_KEY}&page={page}")
+
+def get_tv_top_rated(page=1):
+    return fetch(f"{BASE_URL}/tv/top_rated?api_key={TMDB_API_KEY}&page={page}")
+
+def get_tv_on_the_air(page=1):
+    return fetch(f"{BASE_URL}/tv/on_the_air?api_key={TMDB_API_KEY}&page={page}")
+
+def get_tv_trending(page=1):
+    return fetch(f"{BASE_URL}/trending/tv/week?api_key={TMDB_API_KEY}&page={page}")
+
+def get_tv_details(tv_id):
+    return fetch(f"{BASE_URL}/tv/{tv_id}?api_key={TMDB_API_KEY}")
+
+def get_tv_credits(tv_id):
+    return fetch(f"{BASE_URL}/tv/{tv_id}/credits?api_key={TMDB_API_KEY}")
+
+def get_tv_trailer(tv_id):
+    data = fetch(f"{BASE_URL}/tv/{tv_id}/videos?api_key={TMDB_API_KEY}")
+    for v in data.get("results", []):
+        if v.get("type") == "Trailer" and v.get("site") == "YouTube":
+            return f"https://www.youtube.com/watch?v={v['key']}"
+    return None
     if x >= 1_000_000_000: return f"${x/1e9:.2f}B"
     elif x >= 1_000_000:   return f"${x/1e6:.1f}M"
     elif x > 0:            return f"${x:,}"
@@ -569,6 +746,10 @@ _defaults = {
     "page": "home", "movie_id": None, "watchlist": [],
     "trend_page": 1, "search_page": 1, "rec_page": 1,
     "last_query": "", "last_movie": None,
+    "active_nav": "Browse",
+    "movies_page": 1, "series_page": 1,
+    "movies_filter": "popular",  # popular | top_rated | now_playing | upcoming
+    "series_filter": "popular",  # popular | top_rated | on_the_air
 }
 for k, v in _defaults.items():
     if k not in st.session_state:
@@ -578,8 +759,26 @@ for k, v in _defaults.items():
 # ================= HELPERS =================
 def go_home():
     st.session_state.page = "home"
+    st.session_state.active_nav = "Browse"
     st.session_state.rec_page = 1
     st.session_state.last_movie = None
+    st.rerun()
+
+def go_movies():
+    st.session_state.page = "movies"
+    st.session_state.active_nav = "Movies"
+    st.session_state.movies_page = 1
+    st.rerun()
+
+def go_series():
+    st.session_state.page = "series"
+    st.session_state.active_nav = "Series"
+    st.session_state.series_page = 1
+    st.rerun()
+
+def go_mylist():
+    st.session_state.page = "mylist"
+    st.session_state.active_nav = "My List"
     st.rerun()
 
 def go_detail(mid):
@@ -617,7 +816,56 @@ def movie_card(m, btn_key):
     st.markdown('</div>', unsafe_allow_html=True)
     return clicked
 
-def render_movie_row(movies, key_prefix, max_count=12, ncols=6):
+def tv_card(m, btn_key):
+    """Like movie_card but for TV shows (uses 'name' instead of 'title')"""
+    poster_url = IMG + m["poster_path"] if m.get("poster_path") else None
+    rating = m.get("vote_average", 0)
+    year = (m.get("first_air_date") or "")[:4]
+    title = m.get("name") or m.get("title", "Untitled")
+
+    if poster_url:
+        card_html = f"""<div class="poster-card">
+  <img src="{poster_url}" alt="{title}" loading="lazy"/>
+  <div class="card-play">&#9654;</div>
+  <div class="card-overlay">
+    <div class="card-title-text">{title}</div>
+    <div class="card-meta-row">
+      <span class="card-star">&#9733; {rating:.1f}</span>
+      <span class="card-yr">{year}</span>
+    </div>
+  </div>
+</div>"""
+    else:
+        card_html = f"""<div class="no-poster">
+  <span class="no-poster-t">{title}</span>
+</div>"""
+
+    st.markdown('<div class="poster-click-wrap">', unsafe_allow_html=True)
+    st.markdown(card_html, unsafe_allow_html=True)
+    clicked = st.button("", key=btn_key, help=title)
+    st.markdown('</div>', unsafe_allow_html=True)
+    return clicked
+
+
+def render_tv_row(shows, key_prefix, max_count=12, ncols=6):
+    cols = st.columns(ncols)
+    for i, m in enumerate(shows[:max_count]):
+        with cols[i % ncols]:
+            if tv_card(m, f"{key_prefix}_{m['id']}"):
+                go_detail(m["id"])  # reuse detail page for TV too
+
+
+def render_filter_tabs(options, current, key_prefix):
+    """Render filter tab buttons, return selected value or None"""
+    cols = st.columns(len(options))
+    selected = None
+    for i, (label, val) in enumerate(options):
+        with cols[i]:
+            is_active = (current == val)
+            btn_style = "filter-tab-active" if is_active else "filter-tab"
+            if st.button(label, key=f"{key_prefix}_filter_{val}"):
+                selected = val
+    return selected
     cols = st.columns(ncols)
     for i, m in enumerate(movies[:max_count]):
         with cols[i % ncols]:
@@ -661,22 +909,56 @@ def render_pagination(current_page, total_pages, key_prefix):
     return new_page
 
 def render_navbar(show_back=False):
+    active = st.session_state.active_nav
+
     if show_back:
         st.markdown('<div class="back-nav-wrap">', unsafe_allow_html=True)
         if st.button("← Home", key="nav_back_home"):
             go_home()
         st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown("""
+
+    # Visual navbar
+    active_browse = "active" if active == "Browse" else ""
+    active_movies = "active" if active == "Movies" else ""
+    active_series = "active" if active == "Series" else ""
+    active_mylist = "active" if active == "My List" else ""
+    wl_count = f" ({len(st.session_state.watchlist)})" if st.session_state.watchlist else ""
+
+    st.markdown(f"""
 <div class="lumora-nav">
   <div class="lumora-logo">LUMORA</div>
   <div class="nav-links">
-    <span class="nav-link active">Browse</span>
-    <span class="nav-link">Movies</span>
-    <span class="nav-link">Series</span>
-    <span class="nav-link">My List</span>
+    <span class="nav-link {active_browse}">Browse</span>
+    <span class="nav-link {active_movies}">Movies</span>
+    <span class="nav-link {active_series}">Series</span>
+    <span class="nav-link {active_mylist}">My List{wl_count}</span>
   </div>
   <div class="nav-search-pill">🔍 &nbsp;Search</div>
-</div>""", unsafe_allow_html=True)
+</div>
+<div class="nav-real-btns">
+  <!-- Invisible real buttons rendered below via Streamlit columns -->
+</div>
+""", unsafe_allow_html=True)
+
+    # Invisible real buttons that sit on top of nav visually
+    st.markdown('<div class="nav-click-row">', unsafe_allow_html=True)
+    nc0, nc1, nc2, nc3, nc4, nc_sp, nc5 = st.columns([2.2, 0.55, 0.55, 0.55, 0.7, 2.8, 1.0])
+    with nc1:
+        if st.button("Browse", key="nav_browse"):
+            st.session_state.page = "home"; st.session_state.active_nav = "Browse"; st.rerun()
+    with nc2:
+        if st.button("Movies", key="nav_movies"):
+            go_movies()
+    with nc3:
+        if st.button("Series", key="nav_series"):
+            go_series()
+    with nc4:
+        if st.button("My List", key="nav_mylist"):
+            go_mylist()
+    with nc5:
+        if st.button("🔍 Search", key="nav_search_btn"):
+            st.session_state.page = "home"; st.session_state.active_nav = "Browse"; st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════
@@ -983,5 +1265,181 @@ elif st.session_state.page == "details":
         if new_rp:
             st.session_state.rec_page = new_rp
             st.rerun()
+
+    st.markdown('<div class="lumora-footer">LUMORA &nbsp;·&nbsp; Cinema Rediscovered &nbsp;·&nbsp; Powered by TMDB</div>', unsafe_allow_html=True)
+
+
+# ═══════════════════════════════════════
+#  MOVIES PAGE
+# ═══════════════════════════════════════
+elif st.session_state.page == "movies":
+
+    render_navbar()
+
+    st.markdown('<div class="page-title">Movies</div>', unsafe_allow_html=True)
+
+    # Filter tabs
+    st.markdown('<div class="filter-tab-row">', unsafe_allow_html=True)
+    fcols = st.columns([1, 1, 1.1, 1, 5])
+    mf_labels = ["🌟 Popular", "⭐ Top Rated", "🎬 Now Playing", "🗓 Upcoming"]
+    mf_vals   = ["popular", "top_rated", "now_playing", "upcoming"]
+    for i, (fl, fv) in enumerate(zip(mf_labels, mf_vals)):
+        with fcols[i]:
+            if st.button(fl, key=f"mf_{fv}"):
+                st.session_state.movies_filter = fv
+                st.session_state.movies_page = 1
+                st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    p  = st.session_state.movies_page
+    mf = st.session_state.movies_filter
+    with st.spinner("Loading…"):
+        if mf == "popular":
+            mdata = get_popular_paged(p)
+        elif mf == "top_rated":
+            mdata = get_top_rated_paged(p)
+        elif mf == "now_playing":
+            mdata = get_now_playing_paged(p)
+        else:
+            mdata = get_upcoming(p)
+
+    movies_page_list = mdata.get("results", [])
+    mtotal = min(mdata.get("total_pages", 1), 20)
+
+    st.markdown('<div class="content-section">', unsafe_allow_html=True)
+    mlabel_map = {
+        "popular":     "🌟 Popular Movies",
+        "top_rated":   "⭐ Top Rated Movies",
+        "now_playing": "🎬 Now Playing",
+        "upcoming":    "🗓 Upcoming Releases",
+    }
+    section_header("🎥", mlabel_map.get(mf, "Movies"))
+    render_movie_row(movies_page_list, f"movies_{mf}_{p}", max_count=18, ncols=6)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    new_mp = render_pagination(p, mtotal, f"movies_{mf}")
+    if new_mp:
+        st.session_state.movies_page = new_mp
+        st.rerun()
+
+    st.markdown('<div class="lumora-footer">LUMORA &nbsp;·&nbsp; Cinema Rediscovered &nbsp;·&nbsp; Powered by TMDB</div>', unsafe_allow_html=True)
+
+
+# ═══════════════════════════════════════
+#  SERIES PAGE
+# ═══════════════════════════════════════
+elif st.session_state.page == "series":
+
+    render_navbar()
+
+    st.markdown('<div class="page-title">Series</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="filter-tab-row">', unsafe_allow_html=True)
+    sfcols = st.columns([1, 1, 1.1, 1, 5])
+    sf_labels = ["🌟 Popular", "⭐ Top Rated", "📡 On The Air", "🔥 Trending"]
+    sf_vals   = ["popular", "top_rated", "on_the_air", "trending"]
+    for i, (sl, sv) in enumerate(zip(sf_labels, sf_vals)):
+        with sfcols[i]:
+            if st.button(sl, key=f"sf_{sv}"):
+                st.session_state.series_filter = sv
+                st.session_state.series_page = 1
+                st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    sp2 = st.session_state.series_page
+    sf  = st.session_state.series_filter
+    with st.spinner("Loading…"):
+        if sf == "popular":
+            sdata = get_tv_popular(sp2)
+        elif sf == "top_rated":
+            sdata = get_tv_top_rated(sp2)
+        elif sf == "on_the_air":
+            sdata = get_tv_on_the_air(sp2)
+        else:
+            sdata = get_tv_trending(sp2)
+
+    shows  = sdata.get("results", [])
+    stotal = min(sdata.get("total_pages", 1), 20)
+
+    st.markdown('<div class="content-section">', unsafe_allow_html=True)
+    slabel_map = {
+        "popular":    "🌟 Popular Series",
+        "top_rated":  "⭐ Top Rated Series",
+        "on_the_air": "📡 Currently Airing",
+        "trending":   "🔥 Trending Series",
+    }
+    section_header("📺", slabel_map.get(sf, "Series"))
+    render_tv_row(shows, f"series_{sf}_{sp2}", max_count=18, ncols=6)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    new_sp3 = render_pagination(sp2, stotal, f"series_{sf}")
+    if new_sp3:
+        st.session_state.series_page = new_sp3
+        st.rerun()
+
+    st.markdown('<div class="lumora-footer">LUMORA &nbsp;·&nbsp; Cinema Rediscovered &nbsp;·&nbsp; Powered by TMDB</div>', unsafe_allow_html=True)
+
+
+# ═══════════════════════════════════════
+#  MY LIST PAGE
+# ═══════════════════════════════════════
+elif st.session_state.page == "mylist":
+
+    render_navbar()
+
+    st.markdown('<div class="page-title">My List</div>', unsafe_allow_html=True)
+
+    if not st.session_state.watchlist:
+        st.markdown("""
+<div style="text-align:center;padding:60px 48px 120px;">
+  <div style="font-size:3rem;margin-bottom:16px;">🎬</div>
+  <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:8px;">Your list is empty</div>
+  <div style="font-size:13px;color:rgba(255,255,255,0.4);">Browse movies and series and add them to your list.</div>
+</div>
+""", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns([1, 1, 5])
+        with c1:
+            if st.button("Browse Movies", key="mylist_browse_movies"):
+                go_movies()
+        with c2:
+            if st.button("Browse Series", key="mylist_browse_series"):
+                go_series()
+    else:
+        st.markdown(f'<div class="page-subtitle">{len(st.session_state.watchlist)} title{"s" if len(st.session_state.watchlist)!=1 else ""} saved</div>', unsafe_allow_html=True)
+        st.markdown('<div class="content-section">', unsafe_allow_html=True)
+
+        wl_cols = st.columns(6)
+        to_remove = None
+        for i, m in enumerate(st.session_state.watchlist):
+            with wl_cols[i % 6]:
+                pu = IMG + m["poster"] if m.get("poster") else None
+                if pu:
+                    ch = f"""<div class="poster-card">
+  <img src="{pu}" alt="{m['title']}" loading="lazy"/>
+  <div class="card-play">&#9654;</div>
+  <div class="card-overlay">
+    <div class="card-title-text">{m['title']}</div>
+  </div>
+</div>"""
+                    st.markdown('<div class="poster-click-wrap">', unsafe_allow_html=True)
+                    st.markdown(ch, unsafe_allow_html=True)
+                    if st.button("", key=f"wlp_click_{m['id']}_{i}", help=m["title"]):
+                        go_detail(m["id"])
+                    st.markdown('</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="no-poster"><span class="no-poster-t">{m["title"]}</span></div>', unsafe_allow_html=True)
+                if st.button("✕ Remove", key=f"wl_remove_{m['id']}_{i}"):
+                    to_remove = m["id"]
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        if to_remove is not None:
+            st.session_state.watchlist = [w for w in st.session_state.watchlist if w["id"] != to_remove]
+            st.rerun()
+
+        c1, _, _ = st.columns([1, 1, 5])
+        with c1:
+            if st.button("Continue Browsing", key="mylist_continue"):
+                go_home()
 
     st.markdown('<div class="lumora-footer">LUMORA &nbsp;·&nbsp; Cinema Rediscovered &nbsp;·&nbsp; Powered by TMDB</div>', unsafe_allow_html=True)

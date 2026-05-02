@@ -217,6 +217,11 @@ h1, h2, h3, .stMarkdown h2 {
     cursor: pointer !important;
     transform: none !important;
 }
+    .poster-btn-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}        
 
 /* ── BUTTONS ── */
 .stButton > button {
@@ -509,6 +514,9 @@ if "movie_id" not in st.session_state:
     st.session_state.movie_id = None
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
+    # ================= NEW SESSION ADD =================
+if "auto_trailer" not in st.session_state:
+    st.session_state.auto_trailer = None
 
 # ================= HEADER =================
 st.markdown("## 🎬 LUMORA")
@@ -544,6 +552,7 @@ if st.session_state.page == "home":
                     if st.button("\u200b", key=f"search_{m['id']}"):
                         st.session_state.movie_id = m["id"]
                         st.session_state.page = "details"
+                        st.session_state.auto_trailer = get_trailer(m["id"])
                         st.rerun()
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:
@@ -571,6 +580,7 @@ if st.session_state.page == "home":
                 if st.button("\u200b", key=f"trend_{i}"):
                     st.session_state.movie_id = m["id"]
                     st.session_state.page = "details"
+                    st.session_state.auto_trailer = get_trailer(m["id"])
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
@@ -596,7 +606,10 @@ if st.session_state.page == "home":
 
 # ================= DETAILS =================
 elif st.session_state.page == "details":
-
+    # 🎥 AUTO TRAILER PLAY
+ if st.session_state.auto_trailer:
+    st.video(st.session_state.auto_trailer)
+    st.session_state.auto_trailer = None
     movie_id = st.session_state.movie_id
 
     with st.spinner("Pulling from the vault…"):
@@ -730,6 +743,7 @@ elif st.session_state.page == "details":
                     st.markdown('<div class="poster-btn-wrap">', unsafe_allow_html=True)
                     if st.button("\u200b", key=f"rec_{i}"):
                         st.session_state.movie_id = m["id"]
+                        st.session_state.auto_trailer = get_trailer(m["id"]) 
                         st.rerun()
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:

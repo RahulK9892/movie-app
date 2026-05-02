@@ -496,8 +496,8 @@ def get_trailer(movie_id):
             return f"https://www.youtube.com/watch?v={v['key']}"
     return None
 
-def get_recommendations(movie_id):
-    return fetch(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}")
+def get_recommendations(movie_id,page=1):
+    return fetch(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}&page={page}")
 
 def get_images(movie_id):
     return fetch(f"{BASE_URL}/movie/{movie_id}/images?api_key={TMDB_API_KEY}")
@@ -509,7 +509,8 @@ if "movie_id" not in st.session_state:
     st.session_state.movie_id = None
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
-
+if "rec_page" not in st.session_state:
+    st.session_state.rec_page = 1
 # ================= HEADER =================
 st.markdown("## 🎬 LUMORA")
 st.markdown(
@@ -713,13 +714,13 @@ elif st.session_state.page == "details":
             )
 
     # ── RECOMMENDATIONS ──
-    rec = get_recommendations(movie_id)
+    rec = get_recommendations(movie_id,st.session_state.rec_page)
     if rec.get("results"):
         st.markdown("---")
         st.markdown('<div class="section-title">🎯 You Might Also Like</div>', unsafe_allow_html=True)
 
         cols = st.columns(6)
-        for i, m in enumerate(rec.get("results", [])[:12]):
+        for i, m in enumerate(rec.get("results", [])):
             with cols[i % 6]:
                 if m.get("poster_path"):
                     st.markdown(

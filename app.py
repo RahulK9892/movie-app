@@ -519,24 +519,27 @@ def _render_hero(movie):
         if runtime else ""
     )
 
-    # Complete, self-closing HTML — every div opened is closed
-    st.markdown(f"""
-<div class="hero-wrap">
-  <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
-  <div class="hero-gradient"></div>
-  <div class="hero-content">
-    <div class="hero-tagline">{tagline}</div>
-    <h1 class="hero-title">{title}</h1>
-    <div class="hero-meta">
-      <span class="hero-rating">★ {rating:.1f}</span>
-      <span class="hero-votes">({votes:,} votes)</span>
-      <span class="hero-year">{year}</span>
-      {runtime_html}
-    </div>
-    <div class="hero-genres">{genres_html}</div>
-    <p class="hero-overview">{overview}</p>
-  </div>
-</div>""", unsafe_allow_html=True)
+    # Build HTML as a plain string — avoids Streamlit's markdown parser
+    # treating h1/p tags as markdown and injecting anchor icons / leaking raw HTML
+    hero_html = (
+        '<div class="hero-wrap">'
+          '<div class="hero-bg" style="background-image:url(\'' + bg_url + '\')"></div>'
+          '<div class="hero-gradient"></div>'
+          '<div class="hero-content">'
+            '<div class="hero-tagline">' + tagline + '</div>'
+            '<div class="hero-title">' + title + '</div>'
+            '<div class="hero-meta">'
+              '<span class="hero-rating">&#9733; ' + f"{rating:.1f}" + '</span>'
+              '<span class="hero-votes">(' + f"{votes:,}" + ' votes)</span>'
+              '<span class="hero-year">' + year + '</span>'
+              + runtime_html +
+            '</div>'
+            '<div class="hero-genres">' + genres_html + '</div>'
+            '<div class="hero-overview">' + overview + '</div>'
+          '</div>'
+        '</div>'
+    )
+    st.markdown(hero_html, unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1.3, 1.3, 8])
     with c1:
@@ -594,25 +597,27 @@ def show_detail(movie_id):
             for g in d.get("genres", [])[:4]
         )
         rm_html = (
-            f'<span>·</span><span class="hero-runtime">{rm} min</span>' if rm else ""
+            '<span style="color:var(--muted);font-size:.88rem">&nbsp;·&nbsp;' + str(rm) + ' min</span>' if rm else ""
         )
-        st.markdown(f"""
-<div class="hero-wrap">
-  <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
-  <div class="hero-gradient"></div>
-  <div class="hero-content">
-    <div class="hero-tagline">{tg}</div>
-    <h1 class="hero-title">{title}</h1>
-    <div class="hero-meta">
-      <span class="hero-rating">★ {rt_score:.1f}</span>
-      <span class="hero-votes">({vc:,} votes)</span>
-      <span class="hero-year">{yr}</span>
-      {rm_html}
-    </div>
-    <div class="hero-genres">{gn}</div>
-    <p class="hero-overview">{ov}</p>
-  </div>
-</div>""", unsafe_allow_html=True)
+        hero_html = (
+            '<div class="hero-wrap">'
+              '<div class="hero-bg" style="background-image:url(\'' + bg_url + '\')"></div>'
+              '<div class="hero-gradient"></div>'
+              '<div class="hero-content">'
+                '<div class="hero-tagline">' + tg + '</div>'
+                '<div class="hero-title">' + title + '</div>'
+                '<div class="hero-meta">'
+                  '<span class="hero-rating">&#9733; ' + f"{rt_score:.1f}" + '</span>'
+                  '<span class="hero-votes">(' + f"{vc:,}" + ' votes)</span>'
+                  '<span class="hero-year">' + yr + '</span>'
+                  + rm_html +
+                '</div>'
+                '<div class="hero-genres">' + gn + '</div>'
+                '<div class="hero-overview">' + ov + '</div>'
+              '</div>'
+            '</div>'
+        )
+        st.markdown(hero_html, unsafe_allow_html=True)
 
     # Back + My List buttons
     st.markdown('<div class="detail-wrap">', unsafe_allow_html=True)
@@ -666,46 +671,36 @@ def show_detail(movie_id):
                     'style="width:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.7)">',
                     unsafe_allow_html=True)
         with ci:
-            st.markdown(f'<h1 class="detail-title">{d.get("title","")}</h1>', unsafe_allow_html=True)
+            st.markdown('<div class="detail-title">' + (d.get("title") or d.get("name") or "") + '</div>', unsafe_allow_html=True)
             if d.get("tagline"):
-                st.markdown(f'<div class="detail-tagline">{d["tagline"]}</div>', unsafe_allow_html=True)
+                st.markdown('<div class="detail-tagline">' + d["tagline"] + '</div>', unsafe_allow_html=True)
 
             budget  = d.get("budget") or 0
             revenue = d.get("revenue") or 0
             profit  = revenue - budget if revenue and budget else None
             pcls    = "green" if profit and profit > 0 else ("red" if profit else "")
 
-            st.markdown(f"""
-            <div class="stat-row">
-              <div class="stat-item">
-                <span class="stat-label">Rating</span>
-                <span class="stat-value gold">★ {d.get('vote_average', 0):.1f}/10</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Year</span>
-                <span class="stat-value">{(d.get('release_date', '') or '')[:4]}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Runtime</span>
-                <span class="stat-value">{d.get('runtime', 0)} min</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Budget</span>
-                <span class="stat-value">{fmt_money(budget)}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Revenue</span>
-                <span class="stat-value">{fmt_money(revenue)}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Profit</span>
-                <span class="stat-value {pcls}">{fmt_money(profit)}</span>
-              </div>
-            </div>
-            <div style="font-family:'Nunito Sans',sans-serif;line-height:1.8;
-                        color:rgba(232,224,208,.9);max-width:700px;margin-bottom:18px;">
-              {d.get('overview', '')}
-            </div>""", unsafe_allow_html=True)
+            stat_html = (
+                '<div class="stat-row">'
+                '<div class="stat-item"><span class="stat-label">Rating</span>'
+                '<span class="stat-value gold">&#9733; ' + f"{d.get('vote_average', 0):.1f}" + '/10</span></div>'
+                '<div class="stat-item"><span class="stat-label">Year</span>'
+                '<span class="stat-value">' + (d.get('release_date', '') or '')[:4] + '</span></div>'
+                '<div class="stat-item"><span class="stat-label">Runtime</span>'
+                '<span class="stat-value">' + str(d.get('runtime', 0)) + ' min</span></div>'
+                '<div class="stat-item"><span class="stat-label">Budget</span>'
+                '<span class="stat-value">' + fmt_money(budget) + '</span></div>'
+                '<div class="stat-item"><span class="stat-label">Revenue</span>'
+                '<span class="stat-value">' + fmt_money(revenue) + '</span></div>'
+                '<div class="stat-item"><span class="stat-label">Profit</span>'
+                '<span class="stat-value ' + pcls + '">' + fmt_money(profit) + '</span></div>'
+                '</div>'
+                '<div style="font-family:\'Nunito Sans\',sans-serif;line-height:1.8;'
+                'color:rgba(232,224,208,.9);max-width:700px;margin-bottom:18px;">'
+                + (d.get('overview', '') or '') +
+                '</div>'
+            )
+            st.markdown(stat_html, unsafe_allow_html=True)
 
             genres = " ".join(
                 f'<span class="genre-badge">{g["name"]}</span>'

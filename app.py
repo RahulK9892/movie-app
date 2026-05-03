@@ -96,265 +96,273 @@ st.markdown("""
   --text:  #e8e0d0; --muted: #8a8090;
   --red:   #e53935; --green: #43a047;
 }
-html,body,[class*="css"]{ background:var(--dark)!important; color:var(--text); }
-.stApp{ background:var(--dark)!important; }
-#MainMenu,header,footer{ display:none!important; }
-.block-container{ padding:0!important; max-width:100%!important; }
-section[data-testid="stSidebar"]{ display:none; }
+html, body, [class*="css"] { background: var(--dark) !important; color: var(--text); }
+.stApp { background: var(--dark) !important; }
+#MainMenu, header, footer { display: none !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
+section[data-testid="stSidebar"] { display: none; }
 
-/* NAV column alignment */
+/* ── NAV LAYOUT ── */
 div[data-testid="column"] {
   display: flex !important;
   align-items: center !important;
 }
 
-/* NAV buttons — base style (columns 2-5 = Browse, Movies, Series, My List) */
-div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button,
-div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button,
-div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button,
-div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button {
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid rgba(201,168,76,0.2) !important;
-  border-radius: 20px !important;
+/* ── NAV BUTTONS: base pill style ── */
+button[kind="secondary"],
+div[data-testid="stButton"] > button {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(201,168,76,0.25) !important;
+  border-radius: 22px !important;
   color: var(--text) !important;
   font-family: 'Nunito Sans', sans-serif !important;
   font-weight: 600 !important;
-  font-size: .88rem !important;
-  letter-spacing: .07em !important;
-  padding: 7px 20px !important;
+  font-size: 0.87rem !important;
+  letter-spacing: 0.07em !important;
+  padding: 7px 22px !important;
   box-shadow: none !important;
-  transition: all .2s ease !important;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s !important;
   cursor: pointer !important;
   width: auto !important;
 }
-div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button:hover,
-div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button:hover,
-div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button:hover,
-div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button:hover {
-  background: rgba(201,168,76,0.13) !important;
-  border-color: rgba(201,168,76,0.55) !important;
+button[kind="secondary"]:hover,
+div[data-testid="stButton"] > button:hover {
+  background: rgba(201,168,76,0.14) !important;
+  border-color: rgba(201,168,76,0.6) !important;
   color: var(--gold) !important;
-  box-shadow: 0 0 10px rgba(201,168,76,0.15) !important;
+  box-shadow: 0 0 12px rgba(201,168,76,0.15) !important;
 }
 
-/* NAV column alignment */
-div[data-testid="column"] {
-  display: flex !important;
-  align-items: center !important;
+/* ── NAV ACTIVE state — injected dynamically per button key ── */
+div[data-testid="stButton"]:has(button[data-testid="nav_browse_active"]) > button,
+div[data-testid="stButton"]:has(button[data-testid="nav_movies_active"]) > button,
+div[data-testid="stButton"]:has(button[data-testid="nav_series_active"]) > button,
+div[data-testid="stButton"]:has(button[data-testid="nav_mylist_active"]) > button {
+  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(240,208,128,0.08)) !important;
+  border: 1.5px solid var(--gold) !important;
+  color: var(--gold) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(201,168,76,0.22) !important;
 }
 
-/* LOGO */
-.lumora-logo{
-  font-family:'Cinzel',serif; font-size:1.85rem; font-weight:900;
-  color:var(--gold); letter-spacing:.16em; padding:14px 0;
+/* ── CARD VIEW button — full width at bottom of card ── */
+.card-btn-wrap div[data-testid="stButton"] > button {
+  width: 100% !important;
+  background: rgba(201,168,76,0.1) !important;
+  border: 1px solid rgba(201,168,76,0.25) !important;
+  border-radius: 0 0 8px 8px !important;
+  color: var(--gold) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  padding: 6px 0 !important;
+  letter-spacing: 0.06em !important;
+}
+.card-btn-wrap div[data-testid="stButton"] > button:hover {
+  background: rgba(201,168,76,0.25) !important;
 }
 
-/* HERO */
-.hero-wrap{
-  position:relative; min-height:88vh;
-  display:flex; align-items:flex-end; overflow:hidden;
-}
-.hero-bg{
-  position:absolute; inset:0; background-size:cover;
-  background-position:center top; filter:brightness(.42);
-}
-.hero-gradient{
-  position:absolute; inset:0;
-  background:linear-gradient(90deg,rgba(10,10,15,1) 0%,rgba(10,10,15,.65) 55%,transparent 100%),
-             linear-gradient(0deg,rgba(10,10,15,1) 0%,transparent 52%);
-}
-.hero-content{
-  position:relative; z-index:2;
-  max-width:620px; padding:0 56px 68px;
-}
-.hero-tagline{
-  font-family:'Cinzel',serif; font-size:.72rem;
-  letter-spacing:.32em; color:var(--gold);
-  text-transform:uppercase; margin-bottom:10px;
-}
-.hero-title{
-  font-family:'Cinzel',serif;
-  font-size:clamp(2.2rem,5vw,3.8rem); font-weight:900;
-  line-height:1.05; margin:0 0 14px; color:#fff;
-}
-.hero-meta{ display:flex; align-items:center; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
-.hero-rating{ color:var(--gold); font-weight:700; font-size:1rem; }
-.hero-votes,.hero-year,.hero-runtime{ color:var(--muted); font-size:.88rem; }
-.hero-genres{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-.genre-badge{
-  border:1px solid rgba(201,168,76,.4); border-radius:3px;
-  padding:3px 12px; font-size:.76rem; letter-spacing:.07em;
-  color:var(--gold2); background:rgba(201,168,76,.08);
-}
-.hero-overview{
-  font-family:'Nunito Sans',sans-serif; font-size:.95rem; line-height:1.75;
-  color:rgba(232,224,208,.85); margin-bottom:26px;
-  display:-webkit-box; -webkit-line-clamp:4;
-  -webkit-box-orient:vertical; overflow:hidden;
+/* ── LOGO ── */
+.lumora-logo {
+  font-family: 'Cinzel', serif; font-size: 1.85rem; font-weight: 900;
+  color: var(--gold); letter-spacing: 0.16em; padding: 14px 0;
 }
 
-/* SECTION */
-.section-wrap{ padding:36px 56px; }
-.section-title{
-  font-family:'Cinzel',serif; font-size:1.2rem; font-weight:700;
-  color:var(--text); margin-bottom:20px;
-  border-left:3px solid var(--gold); padding-left:14px;
-  letter-spacing:.06em;
+/* ── HERO ── */
+.hero-wrap {
+  position: relative; min-height: 88vh;
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; background-size: cover;
+  background-position: center top; filter: brightness(0.42);
+}
+.hero-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(10,10,15,1) 0%, rgba(10,10,15,0.65) 55%, transparent 100%),
+              linear-gradient(0deg, rgba(10,10,15,1) 0%, transparent 52%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 620px; padding: 0 56px 68px;
+}
+.hero-tagline {
+  font-family: 'Cinzel', serif; font-size: 0.72rem;
+  letter-spacing: 0.32em; color: var(--gold);
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900;
+  line-height: 1.05; margin: 0 0 14px; color: #fff;
+}
+.hero-meta { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+.hero-rating { color: var(--gold); font-weight: 700; font-size: 1rem; }
+.hero-votes, .hero-year, .hero-runtime { color: var(--muted); font-size: 0.88rem; }
+.hero-genres { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.genre-badge {
+  border: 1px solid rgba(201,168,76,0.4); border-radius: 3px;
+  padding: 3px 12px; font-size: 0.76rem; letter-spacing: 0.07em;
+  color: var(--gold2); background: rgba(201,168,76,0.08);
+}
+.hero-overview {
+  font-family: 'Nunito Sans', sans-serif; font-size: 0.95rem; line-height: 1.75;
+  color: rgba(232,224,208,0.85); margin-bottom: 26px;
+  display: -webkit-box; -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical; overflow: hidden;
 }
 
-/* CARD */
-.movie-card-img{
-  width:100%; border-radius:7px 7px 0 0;
-  display:block; aspect-ratio:2/3; object-fit:cover;
-}
-.movie-card-wrap{
-  background:var(--card); border-radius:8px; overflow:hidden;
-  margin-bottom:4px; transition:transform .2s, box-shadow .2s;
-}
-.movie-card-wrap:hover{ transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,.6); }
-.movie-card-body{ padding:8px 10px 10px; }
-.movie-card-title{
-  font-weight:700; font-size:.82rem;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.movie-card-sub{ font-size:.73rem; color:var(--muted); margin-top:3px; }
-.movie-card-no-img{
-  width:100%; aspect-ratio:2/3; background:var(--card2);
-  display:flex; align-items:center; justify-content:center;
-  font-size:2.2rem; border-radius:7px 7px 0 0;
+/* ── SECTION ── */
+.section-wrap { padding: 36px 56px; }
+.section-title {
+  font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700;
+  color: var(--text); margin-bottom: 20px;
+  border-left: 3px solid var(--gold); padding-left: 14px;
+  letter-spacing: 0.06em;
 }
 
-/* VIEW button */
-div[data-testid="stButton"] > button{
-  width:100%!important; background:rgba(201,168,76,.1)!important;
-  border:1px solid rgba(201,168,76,.25)!important;
-  color:var(--gold)!important; border-radius:0 0 8px 8px!important;
-  font-size:.78rem!important; font-weight:600!important;
-  padding:6px 0!important; letter-spacing:.06em!important;
+/* ── CARD ── */
+.movie-card-img {
+  width: 100%; border-radius: 7px 7px 0 0;
+  display: block; aspect-ratio: 2/3; object-fit: cover;
 }
-div[data-testid="stButton"] > button:hover{
-  background:rgba(201,168,76,.25)!important;
+.movie-card-wrap {
+  background: var(--card); border-radius: 8px; overflow: hidden;
+  margin-bottom: 4px; transition: transform 0.2s, box-shadow 0.2s;
+}
+.movie-card-wrap:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.6); }
+.movie-card-body { padding: 8px 10px 10px; }
+.movie-card-title {
+  font-weight: 700; font-size: 0.82rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.movie-card-sub { font-size: 0.73rem; color: var(--muted); margin-top: 3px; }
+.movie-card-no-img {
+  width: 100%; aspect-ratio: 2/3; background: var(--card2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; border-radius: 7px 7px 0 0;
 }
 
-/* DETAIL */
-.detail-wrap{ padding:36px 56px; }
-.detail-title{
-  font-family:'Cinzel',serif; font-size:clamp(1.8rem,3.5vw,3rem);
-  font-weight:900; margin:0 0 10px; color:#fff;
+/* ── DETAIL ── */
+.detail-wrap { padding: 36px 56px; }
+.detail-title {
+  font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 900; margin: 0 0 10px; color: #fff;
 }
-.detail-tagline{
-  font-family:'Cinzel',serif; font-size:.85rem;
-  color:var(--gold); letter-spacing:.2em;
-  text-transform:uppercase; margin-bottom:18px;
+.detail-tagline {
+  font-family: 'Cinzel', serif; font-size: 0.85rem;
+  color: var(--gold); letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 18px;
 }
-.stat-row{ display:flex; gap:28px; flex-wrap:wrap; margin-bottom:18px; }
-.stat-item{ display:flex; flex-direction:column; }
-.stat-label{ font-size:.68rem; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin-bottom:3px; }
-.stat-value{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1rem; }
-.stat-value.green{ color:var(--green); }
-.stat-value.red  { color:var(--red); }
-.stat-value.gold { color:var(--gold); }
+.stat-row { display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 18px; }
+.stat-item { display: flex; flex-direction: column; }
+.stat-label { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.stat-value { font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 1rem; }
+.stat-value.green { color: var(--green); }
+.stat-value.red   { color: var(--red); }
+.stat-value.gold  { color: var(--gold); }
 
-/* TABS */
-.tab-row-wrap{
-  display:flex; gap:0; border-bottom:1px solid rgba(255,255,255,.1);
-  margin-bottom:26px; flex-wrap:wrap;
+/* ── TABS ── */
+.tab-row-wrap {
+  display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 26px; flex-wrap: wrap;
 }
 .tab-btn-item > div > button,
 .tab-btn-item > div > button:hover,
-.tab-btn-item > div > button:focus{
-  background:transparent!important; border:none!important;
-  border-bottom:2px solid transparent!important;
-  color:var(--muted)!important; font-family:'Nunito Sans',sans-serif!important;
-  font-size:.86rem!important; font-weight:600!important;
-  padding:10px 16px!important; box-shadow:none!important;
-  border-radius:0!important; letter-spacing:.04em!important;
+.tab-btn-item > div > button:focus {
+  background: transparent !important; border: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: var(--muted) !important; font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.86rem !important; font-weight: 600 !important;
+  padding: 10px 16px !important; box-shadow: none !important;
+  border-radius: 0 !important; letter-spacing: 0.04em !important;
+  width: auto !important;
 }
-.tab-btn-item > div > button:hover{ color:var(--text)!important; }
+.tab-btn-item > div > button:hover { color: var(--text) !important; }
 .tab-btn-active > div > button,
 .tab-btn-active > div > button:hover,
-.tab-btn-active > div > button:focus{
-  background:transparent!important; border:none!important;
-  border-bottom:2px solid var(--gold)!important;
-  color:var(--gold)!important; font-family:'Nunito Sans',sans-serif!important;
-  font-size:.86rem!important; font-weight:700!important;
-  padding:10px 16px!important; box-shadow:none!important;
-  border-radius:0!important; letter-spacing:.04em!important;
+.tab-btn-active > div > button:focus {
+  background: transparent !important; border: none !important;
+  border-bottom: 2px solid var(--gold) !important;
+  color: var(--gold) !important; font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.86rem !important; font-weight: 700 !important;
+  padding: 10px 16px !important; box-shadow: none !important;
+  border-radius: 0 !important; letter-spacing: 0.04em !important;
+  width: auto !important;
 }
 
-/* VIDEO */
-.video-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin-bottom:12px; }
-.video-frame{ border-radius:8px; overflow:hidden; background:#000; aspect-ratio:16/9; }
-.video-frame iframe{ width:100%; height:100%; border:none; display:block; }
+/* ── VIDEO ── */
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 12px; }
+.video-frame { border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 16/9; }
+.video-frame iframe { width: 100%; height: 100%; border: none; display: block; }
 
-/* SCENES */
-.scenes-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-.scene-img{ border-radius:6px; overflow:hidden; aspect-ratio:16/9; }
-.scene-img img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .3s; }
-.scene-img:hover img{ transform:scale(1.05); }
+/* ── SCENES ── */
+.scenes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.scene-img { border-radius: 6px; overflow: hidden; aspect-ratio: 16/9; }
+.scene-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+.scene-img:hover img { transform: scale(1.05); }
 
-/* CAST — 10-column HTML grid, no Streamlit columns */
-.cast-outer{
-  display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:12px; margin-bottom:24px;
+/* ── CAST ── */
+.cast-outer {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 12px; margin-bottom: 24px;
 }
-@media(max-width:1400px){ .cast-outer{ grid-template-columns:repeat(8,1fr); } }
-@media(max-width:1100px){ .cast-outer{ grid-template-columns:repeat(6,1fr); } }
-@media(max-width:800px) { .cast-outer{ grid-template-columns:repeat(4,1fr); } }
-.cast-card{
-  background:var(--card); border-radius:8px; overflow:hidden;
-  text-align:center; transition:transform .2s;
+@media(max-width:1400px) { .cast-outer { grid-template-columns: repeat(8, 1fr); } }
+@media(max-width:1100px) { .cast-outer { grid-template-columns: repeat(6, 1fr); } }
+@media(max-width:800px)  { .cast-outer { grid-template-columns: repeat(4, 1fr); } }
+.cast-card {
+  background: var(--card); border-radius: 8px; overflow: hidden;
+  text-align: center; transition: transform 0.2s;
 }
-.cast-card:hover{ transform:translateY(-4px); }
-.cast-photo{ width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
-.cast-ph{
-  width:100%; aspect-ratio:2/3; background:var(--card2);
-  display:flex; align-items:center; justify-content:center; font-size:2rem;
+.cast-card:hover { transform: translateY(-4px); }
+.cast-photo { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+.cast-ph {
+  width: 100%; aspect-ratio: 2/3; background: var(--card2);
+  display: flex; align-items: center; justify-content: center; font-size: 2rem;
 }
-.cast-name{ font-size:.74rem; font-weight:700; padding:6px 6px 2px; line-height:1.25; }
-.cast-char{ font-size:.65rem; color:var(--muted); padding:0 6px 8px; line-height:1.2; }
+.cast-name { font-size: 0.74rem; font-weight: 700; padding: 6px 6px 2px; line-height: 1.25; }
+.cast-char { font-size: 0.65rem; color: var(--muted); padding: 0 6px 8px; line-height: 1.2; }
 
-/* DIRECTOR */
-.director-card{
-  display:flex; align-items:center; gap:22px;
-  background:var(--card2); border-radius:10px; padding:18px 22px;
-  max-width:420px; margin-bottom:10px;
+/* ── DIRECTOR ── */
+.director-card {
+  display: flex; align-items: center; gap: 22px;
+  background: var(--card2); border-radius: 10px; padding: 18px 22px;
+  max-width: 420px; margin-bottom: 10px;
 }
-.director-photo{ width:80px; height:80px; border-radius:50%; object-fit:cover; flex-shrink:0; }
-.director-ph{
-  width:80px; height:80px; border-radius:50%; background:var(--card);
-  display:flex; align-items:center; justify-content:center;
-  font-size:2rem; flex-shrink:0;
+.director-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.director-ph {
+  width: 80px; height: 80px; border-radius: 50%; background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; flex-shrink: 0;
 }
-.director-label{ font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
-.director-name{ font-family:'Cinzel',serif; font-size:1.12rem; font-weight:700; color:var(--gold2); }
+.director-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.director-name { font-family: 'Cinzel', serif; font-size: 1.12rem; font-weight: 700; color: var(--gold2); }
 
-/* REVIEW */
-.review-card{ background:var(--card2); border-radius:8px; padding:18px 22px; margin-bottom:12px; }
-.review-author{ font-weight:700; font-size:.9rem; margin-bottom:6px; }
-.review-body{ font-size:.87rem; line-height:1.75; color:rgba(232,224,208,.8); }
+/* ── REVIEW ── */
+.review-card { background: var(--card2); border-radius: 8px; padding: 18px 22px; margin-bottom: 12px; }
+.review-author { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+.review-body { font-size: 0.87rem; line-height: 1.75; color: rgba(232,224,208,0.8); }
 
-/* MY LIST */
-.mylist-empty{
-  text-align:center; padding:80px 0;
-  color:var(--muted); font-family:'Cinzel',serif; font-size:1.1rem;
+/* ── MY LIST ── */
+.mylist-empty {
+  text-align: center; padding: 80px 0;
+  color: var(--muted); font-family: 'Cinzel', serif; font-size: 1.1rem;
 }
 
-/* SEARCH INPUT */
-div[data-testid="stTextInput"] input{
-  background:var(--card2)!important;
-  border:1px solid rgba(201,168,76,.3)!important;
-  color:var(--text)!important; border-radius:6px!important;
-  font-family:'Nunito Sans',sans-serif!important;
+/* ── SEARCH INPUT ── */
+div[data-testid="stTextInput"] input {
+  background: var(--card2) !important;
+  border: 1px solid rgba(201,168,76,0.3) !important;
+  color: var(--text) !important; border-radius: 6px !important;
+  font-family: 'Nunito Sans', sans-serif !important;
 }
-.divider{ height:1px; background:rgba(255,255,255,.07); margin:6px 0 20px; }
+.divider { height: 1px; background: rgba(255,255,255,0.07); margin: 6px 0 20px; }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  NAV — real Streamlit buttons so clicks actually work
+#  NAV
 # ─────────────────────────────────────────────────────────────────────────────
 def render_nav():
     active = st.session_state.nav_section
@@ -365,44 +373,36 @@ def render_nav():
     with logo_c:
         st.markdown('<div class="lumora-logo">LUMORA</div>', unsafe_allow_html=True)
 
-    # Inject dynamic active-state CSS based on current page/section
+    # Active-state CSS: target buttons by their aria-label (button text) inside nav columns
     browse_active = (page == "home" and active == "trending")
     movies_active = (page == "home" and active == "movies")
     series_active = (page == "home" and active == "series")
     mylist_active = (page == "mylist")
 
-    active_css = ""
+    # Build a CSS rule per active button using the key attribute Streamlit sets
+    active_styles = []
     if browse_active:
-        active_css += """
-        div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button {
-          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
-          border: 1px solid var(--gold) !important; color: var(--gold) !important;
-          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
-        }"""
+        active_styles.append('div[data-testid="stButton"]:has(button[data-testid="baseButton-secondary"][aria-label="Browse"]) > button')
     if movies_active:
-        active_css += """
-        div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button {
-          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
-          border: 1px solid var(--gold) !important; color: var(--gold) !important;
-          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
-        }"""
+        active_styles.append('div[data-testid="stButton"]:has(button[data-testid="baseButton-secondary"][aria-label="Movies"]) > button')
     if series_active:
-        active_css += """
-        div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button {
-          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
-          border: 1px solid var(--gold) !important; color: var(--gold) !important;
-          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
-        }"""
+        active_styles.append('div[data-testid="stButton"]:has(button[data-testid="baseButton-secondary"][aria-label="Series"]) > button')
     if mylist_active:
-        active_css += """
-        div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button {
-          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
-          border: 1px solid var(--gold) !important; color: var(--gold) !important;
-          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
-        }"""
+        n = len(st.session_state.my_list)
+        lbl = f"My List ({n})" if n else "My List"
+        active_styles.append(f'div[data-testid="stButton"]:has(button[data-testid="baseButton-secondary"][aria-label="{lbl}"]) > button')
 
-    if active_css:
-        st.markdown(f"<style>{active_css}</style>", unsafe_allow_html=True)
+    if active_styles:
+        active_css = ", ".join(active_styles)
+        st.markdown(f"""<style>
+        {active_css} {{
+          background: linear-gradient(135deg, rgba(201,168,76,0.28), rgba(240,208,128,0.1)) !important;
+          border: 1.5px solid var(--gold) !important;
+          color: var(--gold) !important;
+          font-weight: 700 !important;
+          box-shadow: 0 0 18px rgba(201,168,76,0.25) !important;
+        }}
+        </style>""", unsafe_allow_html=True)
 
     with br_c:
         if st.button("Browse", key="nav_browse"):
@@ -444,7 +444,7 @@ def render_nav():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  CARD GRID — unique keys via context + movie_id + index
+#  CARD GRID
 # ─────────────────────────────────────────────────────────────────────────────
 def _render_card_grid(items, context="def"):
     n = min(len(items), 12)
@@ -472,9 +472,11 @@ def _render_card_grid(items, context="def"):
               </div>
             </div>""", unsafe_allow_html=True)
 
-            # KEY = context + movie_id + loop-index → guaranteed unique
+            # Wrap in card-btn-wrap so card button CSS applies without breaking nav buttons
+            st.markdown('<div class="card-btn-wrap">', unsafe_allow_html=True)
             if st.button("▶ View", key=f"v_{context}_{mid}_{i}"):
                 open_detail(mid)
+            st.markdown('</div>', unsafe_allow_html=True)
 
 
 def _section(title, items, context="s"):
@@ -486,39 +488,55 @@ def _section(title, items, context="s"):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  HERO
+#  HERO  — fully self-contained HTML block, no open tags left hanging
 # ─────────────────────────────────────────────────────────────────────────────
 def _render_hero(movie):
     backdrop = movie.get("backdrop_path", "")
-    bg_url   = f"{IMG_BASE}/original{backdrop}" if backdrop else ""
-    title    = movie.get("title") or movie.get("name") or ""
-    tagline  = movie.get("tagline") or "Now Streaming"
-    overview = (movie.get("overview") or "")[:280]
-    year     = (movie.get("release_date") or "")[:4]
-    rating   = movie.get("vote_average", 0)
-    votes    = movie.get("vote_count", 0)
-    runtime  = movie.get("runtime", 0)
-    genres   = " ".join(
-        f'<span class="genre-badge">{g["name"]}</span>'
-        for g in movie.get("genres", [])[:4])
+    if not backdrop:
+        return
 
+    bg_url  = f"{IMG_BASE}/original{backdrop}"
+    title   = movie.get("title") or movie.get("name") or ""
+    tagline = movie.get("tagline") or "Now Streaming"
+    overview = (movie.get("overview") or "")[:280]
+    year    = (movie.get("release_date") or movie.get("first_air_date") or "")[:4]
+    rating  = movie.get("vote_average", 0)
+    votes   = movie.get("vote_count", 0)
+    runtime = movie.get("runtime") or 0
+
+    # genres: full detail endpoint returns list of dicts; list endpoint returns genre_ids only
+    genre_objs = movie.get("genres", [])
+    if genre_objs and isinstance(genre_objs[0], dict):
+        genres_html = " ".join(
+            f'<span class="genre-badge">{g["name"]}</span>'
+            for g in genre_objs[:4]
+        )
+    else:
+        genres_html = ""
+
+    runtime_html = (
+        f'<span>·</span><span class="hero-runtime">{runtime} min</span>'
+        if runtime else ""
+    )
+
+    # Complete, self-closing HTML — every div opened is closed
     st.markdown(f"""
-    <div class="hero-wrap">
-      <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
-      <div class="hero-gradient"></div>
-      <div class="hero-content">
-        <div class="hero-tagline">{tagline}</div>
-        <h1 class="hero-title">{title}</h1>
-        <div class="hero-meta">
-          <span class="hero-rating">★ {rating:.1f}</span>
-          <span class="hero-votes">({votes:,} votes)</span>
-          <span class="hero-year">{year}</span>
-          {'<span>·</span><span class="hero-runtime">' + str(runtime) + ' min</span>' if runtime else ''}
-        </div>
-        <div class="hero-genres">{genres}</div>
-        <p class="hero-overview">{overview}</p>
-      </div>
-    </div>""", unsafe_allow_html=True)
+<div class="hero-wrap">
+  <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
+  <div class="hero-gradient"></div>
+  <div class="hero-content">
+    <div class="hero-tagline">{tagline}</div>
+    <h1 class="hero-title">{title}</h1>
+    <div class="hero-meta">
+      <span class="hero-rating">★ {rating:.1f}</span>
+      <span class="hero-votes">({votes:,} votes)</span>
+      <span class="hero-year">{year}</span>
+      {runtime_html}
+    </div>
+    <div class="hero-genres">{genres_html}</div>
+    <p class="hero-overview">{overview}</p>
+  </div>
+</div>""", unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1.3, 1.3, 8])
     with c1:
@@ -533,7 +551,7 @@ def _render_hero(movie):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  CAST GRID — pure HTML (10 per row), no Streamlit widgets → zero key issues
+#  CAST GRID — pure HTML, no Streamlit widgets
 # ─────────────────────────────────────────────────────────────────────────────
 def _cast_html_grid(people, label_field="character"):
     cards = ""
@@ -560,39 +578,43 @@ def show_detail(movie_id):
         st.error("Could not load movie details.")
         return
 
-    # Hero
+    # Hero banner
     backdrop = d.get("backdrop_path", "")
     if backdrop:
-        bg_url = f"{IMG_BASE}/original{backdrop}"
-        title  = d.get("title") or d.get("name") or ""
-        tg     = d.get("tagline") or "Now Streaming"
-        ov     = (d.get("overview") or "")[:280]
-        yr     = (d.get("release_date") or "")[:4]
-        rt     = d.get("vote_average", 0)
-        vc     = d.get("vote_count", 0)
-        rm     = d.get("runtime", 0)
-        gn     = " ".join(
+        bg_url   = f"{IMG_BASE}/original{backdrop}"
+        title    = d.get("title") or d.get("name") or ""
+        tg       = d.get("tagline") or "Now Streaming"
+        ov       = (d.get("overview") or "")[:280]
+        yr       = (d.get("release_date") or "")[:4]
+        rt_score = d.get("vote_average", 0)
+        vc       = d.get("vote_count", 0)
+        rm       = d.get("runtime") or 0
+        gn       = " ".join(
             f'<span class="genre-badge">{g["name"]}</span>'
-            for g in d.get("genres", [])[:4])
+            for g in d.get("genres", [])[:4]
+        )
+        rm_html = (
+            f'<span>·</span><span class="hero-runtime">{rm} min</span>' if rm else ""
+        )
         st.markdown(f"""
-        <div class="hero-wrap">
-          <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
-          <div class="hero-gradient"></div>
-          <div class="hero-content">
-            <div class="hero-tagline">{tg}</div>
-            <h1 class="hero-title">{title}</h1>
-            <div class="hero-meta">
-              <span class="hero-rating">★ {rt:.1f}</span>
-              <span class="hero-votes">({vc:,} votes)</span>
-              <span class="hero-year">{yr}</span>
-              {'<span>·</span><span class="hero-runtime">' + str(rm) + ' min</span>' if rm else ''}
-            </div>
-            <div class="hero-genres">{gn}</div>
-            <p class="hero-overview">{ov}</p>
-          </div>
-        </div>""", unsafe_allow_html=True)
+<div class="hero-wrap">
+  <div class="hero-bg" style="background-image:url('{bg_url}')"></div>
+  <div class="hero-gradient"></div>
+  <div class="hero-content">
+    <div class="hero-tagline">{tg}</div>
+    <h1 class="hero-title">{title}</h1>
+    <div class="hero-meta">
+      <span class="hero-rating">★ {rt_score:.1f}</span>
+      <span class="hero-votes">({vc:,} votes)</span>
+      <span class="hero-year">{yr}</span>
+      {rm_html}
+    </div>
+    <div class="hero-genres">{gn}</div>
+    <p class="hero-overview">{ov}</p>
+  </div>
+</div>""", unsafe_allow_html=True)
 
-    # Back + My List
+    # Back + My List buttons
     st.markdown('<div class="detail-wrap">', unsafe_allow_html=True)
     b1, b2, b3 = st.columns([1, 1.6, 8])
     with b1:
@@ -640,7 +662,7 @@ def show_detail(movie_id):
         with cp:
             if pp:
                 st.markdown(
-                    f'<img src="{poster_url(pp,"w500")}" '
+                    f'<img src="{poster_url(pp, "w500")}" '
                     'style="width:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.7)">',
                     unsafe_allow_html=True)
         with ci:
@@ -657,15 +679,15 @@ def show_detail(movie_id):
             <div class="stat-row">
               <div class="stat-item">
                 <span class="stat-label">Rating</span>
-                <span class="stat-value gold">★ {d.get('vote_average',0):.1f}/10</span>
+                <span class="stat-value gold">★ {d.get('vote_average', 0):.1f}/10</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">Year</span>
-                <span class="stat-value">{(d.get('release_date','') or '')[:4]}</span>
+                <span class="stat-value">{(d.get('release_date', '') or '')[:4]}</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">Runtime</span>
-                <span class="stat-value">{d.get('runtime',0)} min</span>
+                <span class="stat-value">{d.get('runtime', 0)} min</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">Budget</span>
@@ -682,7 +704,7 @@ def show_detail(movie_id):
             </div>
             <div style="font-family:'Nunito Sans',sans-serif;line-height:1.8;
                         color:rgba(232,224,208,.9);max-width:700px;margin-bottom:18px;">
-              {d.get('overview','')}
+              {d.get('overview', '')}
             </div>""", unsafe_allow_html=True)
 
             genres = " ".join(
@@ -700,7 +722,7 @@ def show_detail(movie_id):
 
     # ── TRAILER & VIDEOS ──────────────────────────────────────────────────────
     elif tab == "Trailer & Videos":
-        st.markdown('<div class="section-title">Trailers & Videos</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Trailers &amp; Videos</div>', unsafe_allow_html=True)
         videos  = d.get("videos", {}).get("results", [])
         yt_vids = [v for v in videos if v.get("site") == "YouTube"]
         yt_vids.sort(key=lambda v: (v.get("type") != "Trailer", not v.get("official", False)))
@@ -715,7 +737,7 @@ def show_detail(movie_id):
                     <iframe src="{youtube_embed(v['key'])}" allowfullscreen></iframe>
                   </div>
                   <div style="margin-top:6px;font-size:.78rem;color:var(--muted)">
-                    {v.get('type','')} · {v.get('name','')}
+                    {v.get('type', '')} · {v.get('name', '')}
                   </div>
                 </div>""", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
@@ -742,7 +764,6 @@ def show_detail(movie_id):
         cast    = credits.get("cast", [])[:30]
         crew    = credits.get("crew", [])
 
-        # Directors
         directors = [c for c in crew if c.get("job") == "Director"]
         if directors:
             st.markdown('<div class="section-title">Director</div>', unsafe_allow_html=True)
@@ -756,15 +777,14 @@ def show_detail(movie_id):
                   {photo}
                   <div>
                     <div class="director-label">Director</div>
-                    <div class="director-name">{dr.get('name','')}</div>
+                    <div class="director-name">{dr.get('name', '')}</div>
                     <div style="font-size:.78rem;color:var(--muted);margin-top:4px">
-                      {dr.get('department','')}
+                      {dr.get('department', '')}
                     </div>
                   </div>
                 </div>"""
             st.markdown(dir_html, unsafe_allow_html=True)
 
-        # Key crew
         key_jobs = ["Producer", "Executive Producer", "Screenplay", "Writer",
                     "Director of Photography", "Original Music Composer", "Editor"]
         key_crew = [c for c in crew if c.get("job") in key_jobs][:10]
@@ -773,7 +793,6 @@ def show_detail(movie_id):
                         unsafe_allow_html=True)
             st.markdown(_cast_html_grid(key_crew, "job"), unsafe_allow_html=True)
 
-        # Full cast — pure HTML 10-per-row grid
         if cast:
             st.markdown('<div class="section-title" style="margin-top:28px">Full Cast</div>',
                         unsafe_allow_html=True)
@@ -792,7 +811,7 @@ def show_detail(movie_id):
             ellip = "…" if len(rv.get("content") or "") > 600 else ""
             st.markdown(f"""
             <div class="review-card">
-              <div class="review-author">{rv.get('author','')}
+              <div class="review-author">{rv.get('author', '')}
                 <span style="color:var(--gold);font-size:.82rem;margin-left:10px">{r_str}</span>
               </div>
               <div class="review-body">{body}{ellip}</div>
@@ -807,7 +826,7 @@ def show_detail(movie_id):
         else:
             _render_card_grid(similar, context="sim")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)  # close detail-wrap
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -853,7 +872,7 @@ elif page == "search":
     results = search_movies(st.session_state.search_query)
     st.markdown(
         f'<div class="section-wrap">'
-        f'<div class="section-title">Search: "{st.session_state.search_query}"</div>',
+        f'<div class="section-title">Search: &ldquo;{st.session_state.search_query}&rdquo;</div>',
         unsafe_allow_html=True)
     if results:
         _render_card_grid(results[:12], context="srch")
@@ -874,8 +893,8 @@ else:
             hero = tmdb(f"/tv/{s_trend[0]['id']}",
                         append_to_response="credits,videos,images,similar,reviews")
             _render_hero(hero if hero else s_trend[0])
-        _section("📺 Trending Series",  s_trend, context="strend")
-        _section("🔥 Popular Series",   s_pop,   context="spop")
+        _section("📺 Trending Series", s_trend, context="strend")
+        _section("🔥 Popular Series",  s_pop,   context="spop")
 
     elif nav == "movies":
         pop = get_popular()

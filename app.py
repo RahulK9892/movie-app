@@ -102,24 +102,45 @@ html,body,[class*="css"]{ background:var(--dark)!important; color:var(--text); }
 .block-container{ padding:0!important; max-width:100%!important; }
 section[data-testid="stSidebar"]{ display:none; }
 
-/* NAV buttons */
-.nav-btn > div > button,
-.nav-btn > div > button:hover,
-.nav-btn > div > button:focus {
-  background:transparent!important; border:none!important; border-bottom:2px solid transparent!important;
-  color:var(--text)!important; font-family:'Nunito Sans',sans-serif!important;
-  font-weight:600!important; font-size:.92rem!important; letter-spacing:.08em!important;
-  padding:6px 4px!important; box-shadow:none!important; border-radius:0!important;
+/* NAV column alignment */
+div[data-testid="column"] {
+  display: flex !important;
+  align-items: center !important;
 }
-.nav-btn > div > button:hover{ color:var(--gold)!important; }
-.nav-btn-active > div > button,
-.nav-btn-active > div > button:hover,
-.nav-btn-active > div > button:focus{
-  background:transparent!important; border:none!important;
-  border-bottom:2px solid var(--gold)!important;
-  color:var(--gold)!important; font-family:'Nunito Sans',sans-serif!important;
-  font-weight:700!important; font-size:.92rem!important; letter-spacing:.08em!important;
-  padding:6px 4px!important; box-shadow:none!important; border-radius:0!important;
+
+/* NAV buttons — base style (columns 2-5 = Browse, Movies, Series, My List) */
+div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button,
+div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button,
+div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button,
+div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(201,168,76,0.2) !important;
+  border-radius: 20px !important;
+  color: var(--text) !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: .88rem !important;
+  letter-spacing: .07em !important;
+  padding: 7px 20px !important;
+  box-shadow: none !important;
+  transition: all .2s ease !important;
+  cursor: pointer !important;
+  width: auto !important;
+}
+div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button:hover,
+div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button:hover,
+div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button:hover,
+div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button:hover {
+  background: rgba(201,168,76,0.13) !important;
+  border-color: rgba(201,168,76,0.55) !important;
+  color: var(--gold) !important;
+  box-shadow: 0 0 10px rgba(201,168,76,0.15) !important;
+}
+
+/* NAV column alignment */
+div[data-testid="column"] {
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* LOGO */
@@ -344,42 +365,69 @@ def render_nav():
     with logo_c:
         st.markdown('<div class="lumora-logo">LUMORA</div>', unsafe_allow_html=True)
 
+    # Inject dynamic active-state CSS based on current page/section
+    browse_active = (page == "home" and active == "trending")
+    movies_active = (page == "home" and active == "movies")
+    series_active = (page == "home" and active == "series")
+    mylist_active = (page == "mylist")
+
+    active_css = ""
+    if browse_active:
+        active_css += """
+        div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] > button {
+          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
+          border: 1px solid var(--gold) !important; color: var(--gold) !important;
+          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
+        }"""
+    if movies_active:
+        active_css += """
+        div[data-testid="column"]:nth-child(3) div[data-testid="stButton"] > button {
+          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
+          border: 1px solid var(--gold) !important; color: var(--gold) !important;
+          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
+        }"""
+    if series_active:
+        active_css += """
+        div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] > button {
+          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
+          border: 1px solid var(--gold) !important; color: var(--gold) !important;
+          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
+        }"""
+    if mylist_active:
+        active_css += """
+        div[data-testid="column"]:nth-child(5) div[data-testid="stButton"] > button {
+          background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(240,208,128,0.1)) !important;
+          border: 1px solid var(--gold) !important; color: var(--gold) !important;
+          font-weight: 700 !important; box-shadow: 0 0 12px rgba(201,168,76,0.2) !important;
+        }"""
+
+    if active_css:
+        st.markdown(f"<style>{active_css}</style>", unsafe_allow_html=True)
+
     with br_c:
-        css = "nav-btn-active" if (page == "home" and active == "trending") else "nav-btn"
-        st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         if st.button("Browse", key="nav_browse"):
             st.session_state.page = "home"
             st.session_state.nav_section = "trending"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with mv_c:
-        css = "nav-btn-active" if (page == "home" and active == "movies") else "nav-btn"
-        st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         if st.button("Movies", key="nav_movies"):
             st.session_state.page = "home"
             st.session_state.nav_section = "movies"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with sr_c:
-        css = "nav-btn-active" if (page == "home" and active == "series") else "nav-btn"
-        st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         if st.button("Series", key="nav_series"):
             st.session_state.page = "home"
             st.session_state.nav_section = "series"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with ml_c:
-        css = "nav-btn-active" if page == "mylist" else "nav-btn"
         n   = len(st.session_state.my_list)
         lbl = f"My List ({n})" if n else "My List"
-        st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         if st.button(lbl, key="nav_mylist"):
             st.session_state.page = "mylist"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with sp_c:
         q = st.text_input("", placeholder="🔍  Search movies & series…",

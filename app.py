@@ -874,7 +874,7 @@ def dsh(label):
 </div>""", unsafe_allow_html=True)
 
 def render_pagination(current_page, total_pages, key_prefix):
-    total_pages = max(10, min(int(total_pages), 20))
+    total_pages = min(int(total_pages), 20)
     if total_pages <= 1:
         return None
     st.markdown(f'<div class="page-counter">Page {current_page} of {total_pages}</div>', unsafe_allow_html=True)
@@ -1025,8 +1025,11 @@ if st.session_state.page == "home":
   </div>
 </div>""", unsafe_allow_html=True)
 
-            hc1, _ = st.columns([1.2, 8])
+            hc1, hc2, _ = st.columns([1, 1.2, 7])
             with hc1:
+                if st.button("▶  View Details", key="hero_view"):
+                    go_detail(hid)
+            with hc2:
                 already_wl = any(w["id"] == hid for w in st.session_state.watchlist)
                 lbl = "✓  In My List" if already_wl else "＋  My List"
                 if st.button(lbl, key="hero_wl"):
@@ -1227,25 +1230,18 @@ elif st.session_state.page == "details":
     # ── RECOMMENDATIONS ──
     rec_data   = get_recommendations(movie_id)
     rec_movies = rec_data.get("results", [])
-    # Fetch extra pages to ensure at least 15 recommendations
-    for extra_page in [2, 3]:
-        if len(rec_movies) < 15:
-            extra = fetch(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={TMDB_API_KEY}&page={extra_page}")
-            more = extra.get("results", [])
-            existing_ids = {m["id"] for m in rec_movies}
-            rec_movies += [m for m in more if m["id"] not in existing_ids]
 
     if rec_movies:
         dsh("🎯 You Might Also Like")
-        REC_PER = 15
+        REC_PER = 6
         rec_tp  = max(1, (len(rec_movies) + REC_PER - 1) // REC_PER)
         rstart  = (st.session_state.rec_page - 1) * REC_PER
         rslice  = rec_movies[rstart:rstart + REC_PER]
 
         st.markdown('<div class="rec-grid-wrap">', unsafe_allow_html=True)
-        rcols = st.columns(5)
+        rcols = st.columns(6)
         for i, m in enumerate(rslice):
-            with rcols[i % 5]:
+            with rcols[i % 6]:
                 key = f"rec_{movie_id}_{m['id']}_p{st.session_state.rec_page}"
                 if movie_card(m, key):
                     st.session_state.movie_id  = m["id"]

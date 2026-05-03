@@ -4,6 +4,15 @@ A sleek, Netflix-inspired movie & TV series discovery app built with **Streamlit
 
 ---
 
+## 👥 Group Members
+
+1. Rahul Kumar
+2. Vinit Sindhal
+3. Mahek Anthu
+4. Utkarsh Kumar Nigam
+
+---
+
 ## ✨ Features
 
 - **Browse, Movies & Series tabs** — Switch between trending content, popular movies, and top-rated series with a single click

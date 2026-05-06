@@ -134,7 +134,7 @@ div[data-testid="stButton"] > button:hover {
 }
 
 /* ── NAV ACTIVE state — injected dynamically per button key ── */
-div[data-testid="stButton"]:has(button[data-testid="nav_browse_active"]) > button,
+div[data-testid="stButton"]:has(button[data-testid="nav_home_active"]) > button,
 div[data-testid="stButton"]:has(button[data-testid="nav_movies_active"]) > button,
 div[data-testid="stButton"]:has(button[data-testid="nav_series_active"]) > button,
 div[data-testid="stButton"]:has(button[data-testid="nav_mylist_active"]) > button {
